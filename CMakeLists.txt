@@ -102,15 +102,16 @@ endif()
 find_package(OpenGL REQUIRED)
 
 # --- Alvo do projeto --------------------------------------------------------
-# Adicione aqui os arquivos-fonte do próprio trabalho (ex.: main.cpp) junto
-# com os arquivos da ImGui/backends listados acima.
+file(GLOB PROJECT_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+
 add_executable(${PROJECT_NAME}
     ${IMGUI_CORE_FILES}
     ${IMGUI_BACKEND_FILES}
     ${IMGUI_STDLIB_FILES}
     ${IMGUI_DEBUG_FILES}
-    src/main.cpp
+    ${PROJECT_SRC_FILES}
 )
+set_directory_properties(PROPERTIES VS_STARTUP_PROJECT ${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${imgui_SOURCE_DIR}
