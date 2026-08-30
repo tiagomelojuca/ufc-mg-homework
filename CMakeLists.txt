@@ -102,7 +102,7 @@ endif()
 find_package(OpenGL REQUIRED)
 
 # --- Alvo do projeto --------------------------------------------------------
-file(GLOB PROJECT_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+file(GLOB_RECURSE PROJECT_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 
 add_executable(${PROJECT_NAME}
     ${IMGUI_CORE_FILES}
