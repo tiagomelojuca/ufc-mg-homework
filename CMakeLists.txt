@@ -122,3 +122,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     glfw
     OpenGL::GL
 )
+
+# --- Suíte de testes --------------------------------------------------
+# Inclusão opcional da suíte de testes unitários, controlada pela option
+option(BUILD_TEST_SUIT "Compilar a suíte de testes unitários" ON)
+if(BUILD_TEST_SUIT)
+    enable_testing()
+    add_subdirectory(test)
+endif()
