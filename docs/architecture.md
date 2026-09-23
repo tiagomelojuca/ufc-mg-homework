@@ -17,6 +17,8 @@ Também existem receitas CMake para baixar GLFW, Dear ImGui e GoogleTest. A conf
 
 O núcleo geométrico agora possui `TOctree`, `TNoOctree`, `TCubo`, a configuração do domínio e o contrato de classificação. A construção recursiva segue o algoritmo apresentado em aula. Os classificadores de bloco e esfera estão implementados com construção local. A persistência salva e carrega a representação DF em arquivos de texto compatíveis com o formato do professor.
 
+As operações do núcleo já incluem união e escala. A união percorre duas árvores de forma sincronizada. A escala transforma as regiões das folhas cheias e reconstrói a ocupação no mesmo domínio.
+
 ## Arquitetura-alvo
 
 ```text
@@ -93,6 +95,10 @@ Interface Dear ImGui ─────────┘
 - Uma célula que apenas toca a fronteira de uma primitiva, sem compartilhar volume, é considerada vazia.
 - A classificação da esfera compara o raio com as distâncias da célula mais próxima e mais distante do centro.
 - Operações booleanas percorrem árvores de forma sincronizada e exigem espaços compatíveis.
+- A união aceita profundidades diferentes, produz uma árvore com a maior profundidade configurada e compacta filhos homogêneos.
+- A escala é uniforme, usa a origem como ponto fixo e aceita somente fatores finitos e positivos.
+- A escala transforma as folhas cheias da octree, não as primitivas usadas na construção inicial.
+- Uma operação geométrica é rejeitada quando o volume transformado ultrapassa o domínio.
 - A representação persistida percorre a árvore em profundidade primeiro.
 - O arquivo DF contém somente os símbolos `B`, `W` e `(`, sem cabeçalho, separadores ou marcador de fechamento.
 - Cada `(` deve ser seguido pelas representações de exatamente oito filhos.

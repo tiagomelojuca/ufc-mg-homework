@@ -15,6 +15,8 @@ Um card está concluído quando atende ao critério indicado e passa pela compil
 | `T05` | Implementar a estrutura da octree | Marcos |
 | `T06` | Gerar bloco e esfera | Marcos |
 | `T07` | Salvar e carregar a representação DF | Marcos |
+| `T08` | Implementar união | Marcos |
+| `T09` | Implementar escala | Marcos |
 
 ## Em andamento
 
@@ -24,8 +26,6 @@ Nenhum card.
 
 | ID | Card | Responsável | Critério de aceitação |
 | --- | --- | --- | --- |
-| `T08` | Implementar união | A definir | União opera sobre octrees de mesmo domínio |
-| `T09` | Implementar escala | A definir | Escala gera uma nova octree e respeita o domínio |
 | `T10` | Calcular volume | A definir | Volume calculado pelas folhas cheias |
 | `T11` | Renderizar em aramado | A definir | Bloco e esfera podem ser visualizados |
 | `T12` | Integrar operações à interface | A definir | Profundidade editável; criação, arquivo, união, escala e volume acessíveis |

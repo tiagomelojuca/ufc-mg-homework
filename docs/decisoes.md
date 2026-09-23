@@ -20,6 +20,8 @@ Este documento consolida as decisões que tomamos a partir do enunciado, das aul
 | Domínio raiz | Usaremos o cubo `[-1,1]³`, mantendo o domínio em uma configuração fácil de substituir | [ADR-0009](adrs/0009-dominio-profundidade-e-ordem-dos-octantes.md) |
 | Profundidade | Começaremos com profundidade máxima `5`, alterável pela interface | [ADR-0009](adrs/0009-dominio-profundidade-e-ordem-dos-octantes.md) |
 | Ordem dos octantes | Usaremos a numeração `0...7` da aula, formalizada por `x + 2z + 4y` | [ADR-0009](adrs/0009-dominio-profundidade-e-ordem-dos-octantes.md) |
+| União | Vamos percorrer duas octrees de mesmo domínio em ordem sincronizada e compactar o resultado | [ADR-0010](adrs/0010-uniao-e-escala-de-octrees.md) |
+| Escala | Vamos escalar as folhas cheias uniformemente em torno da origem e reconstruir uma nova octree | [ADR-0010](adrs/0010-uniao-e-escala-de-octrees.md) |
 
 ## Restrições operacionais
 

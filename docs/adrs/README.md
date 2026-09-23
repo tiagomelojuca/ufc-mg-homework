@@ -11,5 +11,6 @@
 | [0007](0007-apresentacao-autossuficiente.md) | Apresentação autossuficiente | Aceito |
 | [0008](0008-validacao-da-infraestrutura-inicial.md) | Validação da infraestrutura inicial | Aceito |
 | [0009](0009-dominio-profundidade-e-ordem-dos-octantes.md) | Domínio, profundidade e ordem dos octantes | Aceito |
+| [0010](0010-uniao-e-escala-de-octrees.md) | União e escala de octrees | Aceito |
 
 Estados possíveis: Proposto, Aceito, Substituído e Rejeitado.
