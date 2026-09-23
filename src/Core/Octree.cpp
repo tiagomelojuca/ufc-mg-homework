@@ -1,6 +1,31 @@
 #include "Octree.h"
 
+#include <algorithm>
 #include <stdexcept>
+#include <utility>
+
+namespace
+{
+  int CalculaProfundidade(
+    const TNoOctree& no
+  )
+  {
+    if (no.EhFolha()) {
+      return 1;
+    }
+
+    int maiorProfundidadeFilho = 0;
+
+    for (std::size_t indice = 0; indice < 8; ++indice) {
+      maiorProfundidadeFilho = std::max(
+        maiorProfundidadeFilho,
+        CalculaProfundidade(no.Filho(indice))
+      );
+    }
+
+    return maiorProfundidadeFilho + 1;
+  }
+}
 
 //----------------------------------------------------------------------------------------------
 
@@ -195,6 +220,32 @@ TOctree::TOctree(
   configuracao(configuracao),
   raiz(configuracao.Dominio())
 {
+}
+
+//----------------------------------------------------------------------------------------------
+
+TOctree::TOctree(
+  const TConfiguracaoOctree& configuracao,
+  TNoOctree&& raiz
+) :
+  configuracao(configuracao),
+  raiz(std::move(raiz))
+{
+  const TCubo& dominio = configuracao.Dominio();
+  const TCubo& regiaoRaiz = this->raiz.Regiao();
+
+  if (
+    regiaoRaiz.Centro().x != dominio.Centro().x ||
+    regiaoRaiz.Centro().y != dominio.Centro().y ||
+    regiaoRaiz.Centro().z != dominio.Centro().z ||
+    regiaoRaiz.Lado() != dominio.Lado()
+  ) {
+    throw std::invalid_argument("A raiz deve representar o dominio da octree");
+  }
+
+  if (CalculaProfundidade(this->raiz) > configuracao.ProfundidadeMaxima()) {
+    throw std::invalid_argument("A raiz excede a profundidade maxima da octree");
+  }
 }
 
 //----------------------------------------------------------------------------------------------

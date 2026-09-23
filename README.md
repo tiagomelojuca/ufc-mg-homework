@@ -11,6 +11,7 @@ O software é um modelador 3D baseado em subdivisão espacial por octree. A impl
 - domínio e profundidade máxima configuráveis;
 - construção recursiva baseada no algoritmo apresentado em aula;
 - geração de octrees para blocos e esferas;
+- persistência textual de octrees no formato DF;
 - testes unitários do núcleo geométrico com GoogleTest.
 
 A interface gráfica ainda está em desenvolvimento. A versão atual abre a janela da aplicação, mas a criação e a manipulação dos modelos ainda não estão disponíveis pela interface.
@@ -71,7 +72,7 @@ A aplicação gráfica requer uma sessão X11, WSLg ou outro ambiente gráfico c
 ctest --test-dir build --output-on-failure
 ```
 
-Os testes do núcleo não abrem janelas nem criam um contexto OpenGL. A suíte atual contém 24 testes.
+Os testes do núcleo não abrem janelas nem criam um contexto OpenGL. A suíte atual contém 36 testes.
 
 Para compilar sem os testes:
 

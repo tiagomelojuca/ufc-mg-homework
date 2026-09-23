@@ -29,6 +29,7 @@ add_executable(${PROJECT_NAME}_tests
 
 target_link_libraries(${PROJECT_NAME}_tests PRIVATE
     ${PROJECT_NAME}_core
+    ${PROJECT_NAME}_persistence
     gtest_main
 )
 

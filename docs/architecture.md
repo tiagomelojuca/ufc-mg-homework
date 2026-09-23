@@ -15,7 +15,7 @@ main.cpp
 
 Também existem receitas CMake para baixar GLFW, Dear ImGui e GoogleTest. A configuração, a aplicação gráfica e os testes já foram executados em Linux.
 
-O núcleo geométrico agora possui `TOctree`, `TNoOctree`, `TCubo`, a configuração do domínio e o contrato de classificação. A construção recursiva segue o algoritmo apresentado em aula. Os classificadores de bloco e esfera estão implementados com construção local.
+O núcleo geométrico agora possui `TOctree`, `TNoOctree`, `TCubo`, a configuração do domínio e o contrato de classificação. A construção recursiva segue o algoritmo apresentado em aula. Os classificadores de bloco e esfera estão implementados com construção local. A persistência salva e carrega a representação DF em arquivos de texto compatíveis com o formato do professor.
 
 ## Arquitetura-alvo
 
@@ -94,6 +94,9 @@ Interface Dear ImGui ─────────┘
 - A classificação da esfera compara o raio com as distâncias da célula mais próxima e mais distante do centro.
 - Operações booleanas percorrem árvores de forma sincronizada e exigem espaços compatíveis.
 - A representação persistida percorre a árvore em profundidade primeiro.
+- O arquivo DF contém somente os símbolos `B`, `W` e `(`, sem cabeçalho, separadores ou marcador de fechamento.
+- Cada `(` deve ser seguido pelas representações de exatamente oito filhos.
+- A leitura rejeita entrada vazia, símbolos desconhecidos, árvores incompletas, conteúdo excedente e profundidade incompatível com a configuração.
 - A mesma string só preserva a geometria entre modeladores quando todos compartilham o domínio raiz e a ordem espacial dos oito filhos.
 
 ## Fluxo principal

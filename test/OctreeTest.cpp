@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <stdexcept>
+#include <utility>
 
 #include "Core/Octree.h"
 
@@ -160,6 +161,29 @@ TEST(OctreeTest, deve_rejeitar_configuracoes_invalidas)
     TConfiguracaoOctree(TCubo({ 0.0, 0.0, 0.0 }, 2.0), 0),
     std::invalid_argument
   );
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(OctreeTest, deve_rejeitar_uma_raiz_que_nao_representa_o_dominio)
+{
+  const TConfiguracaoOctree configuracao;
+  TNoOctree raiz(TCubo({ 0.5, 0.0, 0.0 }, 1.0));
+
+  EXPECT_THROW(TOctree(configuracao, std::move(raiz)), std::invalid_argument);
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(OctreeTest, deve_rejeitar_uma_raiz_acima_da_profundidade_configurada)
+{
+  const TConfiguracaoOctree configuracao(
+    TCubo({ 0.0, 0.0, 0.0 }, 2.0),
+    1
+  );
+  TNoOctree raiz(configuracao.Dominio(), EEstadoNoOctree::PARCIAL);
+
+  EXPECT_THROW(TOctree(configuracao, std::move(raiz)), std::invalid_argument);
 }
 
 //----------------------------------------------------------------------------------------------

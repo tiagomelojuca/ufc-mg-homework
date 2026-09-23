@@ -141,6 +141,11 @@ class TOctree
     );
 
     TOctree(
+      const TConfiguracaoOctree& configuracao,
+      TNoOctree&& raiz
+    );
+
+    TOctree(
       const TOctree&
     ) = delete;
 

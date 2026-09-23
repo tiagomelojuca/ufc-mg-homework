@@ -14,6 +14,7 @@ Um card está concluído quando atende ao critério indicado e passa pela compil
 | `T04` | Configurar GoogleTest | Thiago |
 | `T05` | Implementar a estrutura da octree | Marcos |
 | `T06` | Gerar bloco e esfera | Marcos |
+| `T07` | Salvar e carregar a representação DF | Marcos |
 
 ## Em andamento
 
@@ -23,7 +24,6 @@ Nenhum card.
 
 | ID | Card | Responsável | Critério de aceitação |
 | --- | --- | --- | --- |
-| `T07` | Salvar e carregar a representação DF | A definir | Leitura e escrita compatíveis com o formato do professor |
 | `T08` | Implementar união | A definir | União opera sobre octrees de mesmo domínio |
 | `T09` | Implementar escala | A definir | Escala gera uma nova octree e respeita o domínio |
 | `T10` | Calcular volume | A definir | Volume calculado pelas folhas cheias |
