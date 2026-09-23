@@ -13,9 +13,9 @@ main.cpp
         └── loop de eventos e renderização
 ```
 
-Também existem receitas CMake para baixar GLFW, Dear ImGui e GoogleTest. A suíte de testes possui somente um teste de fumaça. `Octree.h` e `Octree.cpp` ainda não contêm a estrutura ou os algoritmos do domínio.
+Também existem receitas CMake para baixar GLFW, Dear ImGui e GoogleTest. A configuração, a aplicação gráfica e os testes já foram executados em Linux.
 
-O código atual prova parte da integração gráfica, mas ainda não foi validado em Linux. Por isso, essa infraestrutura é considerada **iniciada e pendente de validação**, não concluída.
+O núcleo geométrico agora possui `TOctree`, `TNoOctree`, `TCubo`, a configuração do domínio e o contrato de classificação. A construção recursiva segue o algoritmo apresentado em aula. Os classificadores de bloco e esfera estão implementados com construção local.
 
 ## Arquitetura-alvo
 
@@ -28,7 +28,8 @@ Aplicação / casos de uso
         │
         ▼
 Núcleo geométrico
-├── Octree e OctreeNode
+├── TOctree e TNoOctree
+├── TCubo e TConfiguracaoOctree
 ├── domínio espacial e octantes
 ├── classificadores de primitivas
 ├── percursos e compactação
@@ -87,6 +88,10 @@ Interface Dear ImGui ─────────┘
 - Os filhos seguem a ordem `x + 2z + 4y`, com bits `0` para as metades inferiores e `1` para as superiores.
 - A subdivisão ocorre somente em células parciais, caracterizando a estratégia local.
 - Ao atingir o limitante de profundidade, o algoritmo mostrado pelo professor assume o bloco terminal como cheio.
+- O bloco é alinhado aos eixos e parametrizado por centro e três lados.
+- A esfera é parametrizada por centro e raio.
+- Uma célula que apenas toca a fronteira de uma primitiva, sem compartilhar volume, é considerada vazia.
+- A classificação da esfera compara o raio com as distâncias da célula mais próxima e mais distante do centro.
 - Operações booleanas percorrem árvores de forma sincronizada e exigem espaços compatíveis.
 - A representação persistida percorre a árvore em profundidade primeiro.
 - A mesma string só preserva a geometria entre modeladores quando todos compartilham o domínio raiz e a ordem espacial dos oito filhos.

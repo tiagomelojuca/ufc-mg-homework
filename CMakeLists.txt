@@ -108,7 +108,17 @@ endif()
 find_package(OpenGL REQUIRED)
 
 # --- Alvo do projeto --------------------------------------------------------
+file(GLOB_RECURSE CORE_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/*.cpp)
 file(GLOB_RECURSE PROJECT_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+list(REMOVE_ITEM PROJECT_SRC_FILES ${CORE_SRC_FILES})
+
+add_library(${PROJECT_NAME}_core
+    ${CORE_SRC_FILES}
+)
+
+target_include_directories(${PROJECT_NAME}_core PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
 
 add_executable(${PROJECT_NAME}
     ${IMGUI_CORE_FILES}
@@ -125,6 +135,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
+    ${PROJECT_NAME}_core
     glfw
     OpenGL::GL
 )

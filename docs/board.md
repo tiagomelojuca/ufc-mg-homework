@@ -12,6 +12,8 @@ Um card está concluído quando atende ao critério indicado e passa pela compil
 | `T02` | Configurar C++17, CMake, GLFW, OpenGL e Dear ImGui | Thiago |
 | `T03` | Criar janela OpenGL com Dear ImGui | Thiago |
 | `T04` | Configurar GoogleTest | Thiago |
+| `T05` | Implementar a estrutura da octree | Marcos |
+| `T06` | Gerar bloco e esfera | Marcos |
 
 ## Em andamento
 
@@ -21,8 +23,6 @@ Nenhum card.
 
 | ID | Card | Responsável | Critério de aceitação |
 | --- | --- | --- | --- |
-| `T05` | Implementar a estrutura da octree | A definir | Nós `B`, `W` e parcial; domínio `[-1,1]³`; profundidade padrão `5`; oito filhos na ordem definida |
-| `T06` | Gerar bloco e esfera | A definir | Construção local respeita domínio e profundidade |
 | `T07` | Salvar e carregar a representação DF | A definir | Leitura e escrita compatíveis com o formato do professor |
 | `T08` | Implementar união | A definir | União opera sobre octrees de mesmo domínio |
 | `T09` | Implementar escala | A definir | Escala gera uma nova octree e respeita o domínio |

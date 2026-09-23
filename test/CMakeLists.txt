@@ -1,13 +1,13 @@
-# Crie a receita deste CMakeLists para a suÌte de testes unit·rios da aplicaÁ„o
+# Crie a receita deste CMakeLists para a su√≠te de testes unit√°rios da aplica√ß√£o
 # Deve utilizar gtest ( https://github.com/google/googletest ), tag v1.18.0,
-# obtido a partir da API de FetchContent. O build deste mÛdulo n„o È obrigatÛrio,
-# deve ser incluÌdo no CMakeLists raiz por meio de add_subdirectory, mas apenas
+# obtido a partir da API de FetchContent. O build deste m√≥dulo n√£o √© obrigat√≥rio,
+# deve ser inclu√≠do no CMakeLists raiz por meio de add_subdirectory, mas apenas
 # mediante a uma option ligada, a saber, BUILD_TEST_SUIT. Caso esteja off,
-# n„o inclui o presente CMakeLists
+# n√£o inclui o presente CMakeLists
 
 include(FetchContent)
 
-# No MSVC, forÁa o gtest a usar a runtime library din‚mica (/MD, /MDd),
+# No MSVC, for√ßa o gtest a usar a runtime library din√¢mica (/MD, /MDd),
 # a mesma usada pelo restante do projeto, evitando conflitos de linkagem.
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
@@ -20,7 +20,7 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(googletest)
 
-# --- Alvo da suÌte de testes --------------------------------------------
+# --- Alvo da su√≠te de testes --------------------------------------------
 file(GLOB TEST_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
 add_executable(${PROJECT_NAME}_tests
@@ -28,6 +28,7 @@ add_executable(${PROJECT_NAME}_tests
 )
 
 target_link_libraries(${PROJECT_NAME}_tests PRIVATE
+    ${PROJECT_NAME}_core
     gtest_main
 )
 
