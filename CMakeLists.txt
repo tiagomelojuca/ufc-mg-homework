@@ -1,36 +1,36 @@
-# Odeio CMake, ent„o vocÍ vai escrever pra mim
-# Vou te dar a receita em alto nÌvel, daÌ vocÍ se vira para escrever
+# Odeio CMake, ent√£o voc√™ vai escrever pra mim
+# Vou te dar a receita em alto n√≠vel, da√≠ voc√™ se vira para escrever
 # Quero um CMakeLists bem simples que defina um projeto "ufc-mg-homework",
 # utilizando C++17 e que use a API de FetchContent para baixar a tag 1.92.9
 # da biblioteca Dear ImGui, consagrada para UIs em Immediate Mode
-# ( https://github.com/ocornut/imgui ). ApÛs o MakeAvailable, deve existir
+# ( https://github.com/ocornut/imgui ). Ap√≥s o MakeAvailable, deve existir
 # uma pasta para o imgui. Deve incluir imgui/ e imgui/backends aos Include Paths.
-# Adicionalmente, deve adicionar ao projeto todos *.cpp e *.h da raÌz.
-# Deve adicionar tambÈm os arquivos fonte e arquivos cabeÁalho do backend
+# Adicionalmente, deve adicionar ao projeto todos *.cpp e *.h da ra√≠z.
+# Deve adicionar tamb√©m os arquivos fonte e arquivos cabe√ßalho do backend
 # que iremos utilizar, a saber, imgui_impl_glfw.* e imgui_impl_opengl3.*
-# Deve incluir tambÈm as utils imgui/misc/cpp/imgui_stdlib.*, que pelo visto
-# È necess·rio para interagir com alguns containers da STL, como std::string
-# Finalmente, como uso MSVC, parece uma boa tambÈm incluir os arquivos de
-# depuraÁ„o auxiliares imgui/misc/debuggers, imgui.natvis e imgui.natstepfilter
-# Qualquer d˙vida pode consultar a documentaÁ„o de integraÁ„o a projetos em
-# https://github.com/ocornut/imgui/wiki/Getting-Started, mas acho que j· te passei
+# Deve incluir tamb√©m as utils imgui/misc/cpp/imgui_stdlib.*, que pelo visto
+# √© necess√°rio para interagir com alguns containers da STL, como std::string
+# Finalmente, como uso MSVC, parece uma boa tamb√©m incluir os arquivos de
+# depura√ß√£o auxiliares imgui/misc/debuggers, imgui.natvis e imgui.natstepfilter
+# Qualquer d√∫vida pode consultar a documenta√ß√£o de integra√ß√£o a projetos em
+# https://github.com/ocornut/imgui/wiki/Getting-Started, mas acho que j√° te passei
 # os pontos mais relevantes para a receita.
-# Note que optei pelo backend em GLFW ( https://github.com/glfw/glfw ), entao tambÈm
-# precisaremos adicion·-lo ao projeto, inclusive, provavelmente antes da prÛpria ImGUI
-# Pode utilizar tambÈm a API de FetchContent para isso, com alvo na tag 3.5.1
-# … importante nossa receita ser autocontida, reprodutÌvel e multi-plataforma,
-# pois o time È diversificado: alguns usam Windows+MSVC, outros Windows+GCC, Linux+GCC etc
-# Se for declarar vari·veis ou coment·rios na receita, faÁa em portuguÍs, a n„o ser que
-# seja algo herdado do projeto original ou idiom·tico para o contexto
+# Note que optei pelo backend em GLFW ( https://github.com/glfw/glfw ), entao tamb√©m
+# precisaremos adicion√°-lo ao projeto, inclusive, provavelmente antes da pr√≥pria ImGUI
+# Pode utilizar tamb√©m a API de FetchContent para isso, com alvo na tag 3.5.1
+# √â importante nossa receita ser autocontida, reprodut√≠vel e multi-plataforma,
+# pois o time √© diversificado: alguns usam Windows+MSVC, outros Windows+GCC, Linux+GCC etc
+# Se for declarar vari√°veis ou coment√°rios na receita, fa√ßa em portugu√™s, a n√£o ser que
+# seja algo herdado do projeto original ou idiom√°tico para o contexto
 
 cmake_minimum_required(VERSION 3.16)
 
 project(ufc-mg-homework LANGUAGES CXX)
 
-# Evita build "in-source", que costuma causar dor de cabeÁa em times com
+# Evita build "in-source", que costuma causar dor de cabe√ßa em times com
 # ambientes diferentes (Windows/Linux, MSVC/GCC).
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
-    message(FATAL_ERROR "N„o gere o build dentro da prÛpria pasta do cÛdigo-fonte. Use, por exemplo: cmake -S . -B build")
+    message(FATAL_ERROR "N√£o gere o build dentro da pr√≥pria pasta do c√≥digo-fonte. Use, por exemplo: cmake -S . -B build")
 endif()
 
 set(CMAKE_CXX_STANDARD 17)
@@ -40,13 +40,19 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 include(FetchContent)
 
 # --- GLFW -------------------------------------------------------------
-# Baixado antes da Dear ImGui, j· que o backend da ImGui depende dele.
-# Desligamos exemplos/testes/documentaÁ„o da GLFW: n„o precisamos disso
-# e assim o build fica mais r·pido e mais leve.
+# Baixado antes da Dear ImGui, j√° que o backend da ImGui depende dele.
+# Desligamos exemplos/testes/documenta√ß√£o da GLFW: n√£o precisamos disso
+# e assim o build fica mais r√°pido e mais leve.
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
+
+if(UNIX AND NOT APPLE)
+    option(UFC_MG_USE_WAYLAND "Compilar a GLFW com suporte a Wayland" OFF)
+    set(GLFW_BUILD_X11 ON CACHE BOOL "" FORCE)
+    set(GLFW_BUILD_WAYLAND ${UFC_MG_USE_WAYLAND} CACHE BOOL "" FORCE)
+endif()
 
 FetchContent_Declare(
     glfw
@@ -57,12 +63,12 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(glfw)
 
 # --- Dear ImGui ---------------------------------------------------------
-# A ImGui n„o possui CMakeLists.txt prÛprio na raiz do repositÛrio (ela È
-# distribuÌda como um conjunto de fontes para serem adicionadas direto ao
-# projeto do usu·rio, conforme o guia oficial de integraÁ„o). Por isso,
-# FetchContent_MakeAvailable sÛ baixa e popula os fontes (em imgui_SOURCE_DIR),
-# sem tentar fazer add_subdirectory ó quem monta os alvos de compilaÁ„o
-# somos nÛs, logo abaixo.
+# A ImGui n√£o possui CMakeLists.txt pr√≥prio na raiz do reposit√≥rio (ela √©
+# distribu√≠da como um conjunto de fontes para serem adicionadas direto ao
+# projeto do usu√°rio, conforme o guia oficial de integra√ß√£o). Por isso,
+# FetchContent_MakeAvailable s√≥ baixa e popula os fontes (em imgui_SOURCE_DIR),
+# sem tentar fazer add_subdirectory ‚Äî quem monta os alvos de compila√ß√£o
+# somos n√≥s, logo abaixo.
 FetchContent_Declare(
     imgui
     GIT_REPOSITORY https://github.com/ocornut/imgui.git
@@ -78,21 +84,21 @@ file(GLOB IMGUI_CORE_FILES
     "${imgui_SOURCE_DIR}/*.h"
 )
 
-# Backend escolhido: GLFW (janela/input) + OpenGL3 (renderizaÁ„o).
+# Backend escolhido: GLFW (janela/input) + OpenGL3 (renderiza√ß√£o).
 file(GLOB IMGUI_BACKEND_FILES
     "${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.*"
     "${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.*"
 )
 
-# Utilit·rio para interagir com containers da STL (ex.: std::string em
+# Utilit√°rio para interagir com containers da STL (ex.: std::string em
 # ImGui::InputText).
 file(GLOB IMGUI_STDLIB_FILES
     "${imgui_SOURCE_DIR}/misc/cpp/imgui_stdlib.*"
 )
 
-# Arquivos auxiliares de depuraÁ„o, ˙teis no Visual Studio/MSVC
-# (natvis/natstepfilter n„o tÍm efeito em outros compiladores, ent„o
-# sÛ os adicionamos quando fizer sentido).
+# Arquivos auxiliares de depura√ß√£o, √∫teis no Visual Studio/MSVC
+# (natvis/natstepfilter n√£o t√™m efeito em outros compiladores, ent√£o
+# s√≥ os adicionamos quando fizer sentido).
 set(IMGUI_DEBUG_FILES "")
 if(MSVC)
     file(GLOB IMGUI_DEBUG_FILES "${imgui_SOURCE_DIR}/misc/debuggers/*")
@@ -123,9 +129,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     OpenGL::GL
 )
 
-# --- SuÌte de testes --------------------------------------------------
-# Inclus„o opcional da suÌte de testes unit·rios, controlada pela option
-option(BUILD_TEST_SUIT "Compilar a suÌte de testes unit·rios" ON)
+# --- Su√≠te de testes --------------------------------------------------
+# Inclus√£o opcional da su√≠te de testes unit√°rios, controlada pela option
+option(BUILD_TEST_SUIT "Compilar a su√≠te de testes unit√°rios" ON)
 if(BUILD_TEST_SUIT)
     enable_testing()
     add_subdirectory(test)

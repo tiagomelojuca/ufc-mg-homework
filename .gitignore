@@ -72,3 +72,6 @@ Testing/
 .cache/
 
 .vs/
+
+# Dear ImGui
+imgui.ini

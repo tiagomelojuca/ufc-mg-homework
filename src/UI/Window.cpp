@@ -1,5 +1,15 @@
 #include "Window.h"
 
+#include <iostream>
+
+namespace
+{
+  void RegistraErroGlfw(int codigo, const char* descricao)
+  {
+    std::cerr << "GLFW (" << codigo << "): " << descricao << '\n';
+  }
+}
+
 //----------------------------------------------------------------------------------------------
 
 TWindow::TWindow(
@@ -69,6 +79,8 @@ GLFWwindow* TWindow::InstanciaGLFW()
 
 bool TWindow::Inicializa()
 {
+  glfwSetErrorCallback(RegistraErroGlfw);
+
   if (!glfwInit()) {
     return false;
   }
