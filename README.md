@@ -12,6 +12,9 @@ O software é um modelador 3D baseado em subdivisão espacial por octree. A impl
 - construção recursiva baseada no algoritmo apresentado em aula;
 - geração de octrees para blocos e esferas;
 - persistência textual de octrees no formato DF;
+- união de octrees com domínios compatíveis;
+- escala uniforme de octrees em torno da origem;
+- cálculo de volume pelas folhas cheias;
 - testes unitários do núcleo geométrico com GoogleTest.
 
 A interface gráfica ainda está em desenvolvimento. A versão atual abre a janela da aplicação, mas a criação e a manipulação dos modelos ainda não estão disponíveis pela interface.
@@ -72,7 +75,7 @@ A aplicação gráfica requer uma sessão X11, WSLg ou outro ambiente gráfico c
 ctest --test-dir build --output-on-failure
 ```
 
-Os testes do núcleo não abrem janelas nem criam um contexto OpenGL. A suíte atual contém 36 testes.
+Os testes do núcleo não abrem janelas nem criam um contexto OpenGL. A suíte atual contém 59 testes.
 
 Para compilar sem os testes:
 
@@ -95,6 +98,7 @@ cmake --build build-wayland --parallel
 
 ```text
 src/Core/    núcleo geométrico e octree
+src/Persistence/ persistência da representação DF
 src/UI/      janela e interface gráfica
 test/        testes unitários
 ```
@@ -106,4 +110,7 @@ test/        testes unitários
 - O domínio padrão é o cubo `[-1,1]³`.
 - A profundidade máxima padrão é `5`.
 - Blocos e esferas são classificados contra cada célula como fora, dentro ou parcial.
+- A união percorre duas octrees de mesmo domínio e produz uma nova árvore compactada.
+- A escala transforma as folhas cheias e reconstrói a ocupação no domínio configurado.
+- O volume é calculado recursivamente pela soma dos cubos representados pelas folhas cheias.
 - Os algoritmos seguem as abstrações apresentadas em aula e na bibliografia da disciplina.

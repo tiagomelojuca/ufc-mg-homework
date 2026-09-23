@@ -17,6 +17,7 @@ Um card está concluído quando atende ao critério indicado e passa pela compil
 | `T07` | Salvar e carregar a representação DF | Marcos |
 | `T08` | Implementar união | Marcos |
 | `T09` | Implementar escala | Marcos |
+| `T10` | Calcular volume | Marcos |
 
 ## Em andamento
 
@@ -26,7 +27,6 @@ Nenhum card.
 
 | ID | Card | Responsável | Critério de aceitação |
 | --- | --- | --- | --- |
-| `T10` | Calcular volume | A definir | Volume calculado pelas folhas cheias |
 | `T11` | Renderizar em aramado | A definir | Bloco e esfera podem ser visualizados |
 | `T12` | Integrar operações à interface | A definir | Profundidade editável; criação, arquivo, união, escala e volume acessíveis |
 | `T13` | Definir e construir o tema | A definir | Testar o Ford Escort e trocar o tema se ele não for viável |
