@@ -18,6 +18,7 @@ Um card está concluído quando atende ao critério indicado e passa pela compil
 | `T08` | Implementar união | Marcos |
 | `T09` | Implementar escala | Marcos |
 | `T10` | Calcular volume | Marcos |
+| `T11` | Renderizar em aramado | Marcos |
 
 ## Em andamento
 
@@ -27,7 +28,6 @@ Nenhum card.
 
 | ID | Card | Responsável | Critério de aceitação |
 | --- | --- | --- | --- |
-| `T11` | Renderizar em aramado | A definir | Bloco e esfera podem ser visualizados |
 | `T12` | Integrar operações à interface | A definir | Profundidade editável; criação, arquivo, união, escala e volume acessíveis |
 | `T13` | Definir e construir o tema | A definir | Testar o Ford Escort e trocar o tema se ele não for viável |
 | `T14` | Validar o MVP | A definir | Fluxo completo e testes aprovados em Linux |

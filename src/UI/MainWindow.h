@@ -2,6 +2,7 @@
 #define MAINWINDOW_H_
 
 #include "Window.h"
+#include "Core/AramadoOctree.h"
 
 //----------------------------------------------------------------------------------------------
 
@@ -31,10 +32,7 @@ class TEstrategiaProcessamentoMainWindow : public TWindow::TEstrategiaProcessame
   public:
     TEstrategiaProcessamentoMainWindow(
       TWindow& wnd
-    ) :
-      TWindow::TEstrategiaProcessamento(wnd)
-    {
-    }
+    );
 
     TEstrategiaProcessamento* Copia() const override
     {
@@ -42,6 +40,11 @@ class TEstrategiaProcessamentoMainWindow : public TWindow::TEstrategiaProcessame
     }
 
     void Executa() override;
+
+  private:
+    TConfiguracaoOctree configuracao;
+    std::vector<TAresta3D> arestasBloco;
+    std::vector<TAresta3D> arestasEsfera;
 };
 
 //----------------------------------------------------------------------------------------------

@@ -9,7 +9,8 @@ main.cpp
 └── TMainWindow
     └── TWindow
         ├── GLFW / contexto OpenGL
-        ├── Dear ImGui / janela de demonstração
+        ├── Dear ImGui / identificação dos modelos
+        ├── TRenderizadorAramado / desenho OpenGL
         └── loop de eventos e renderização
 ```
 
@@ -18,6 +19,8 @@ Também existem receitas CMake para baixar GLFW, Dear ImGui e GoogleTest. A conf
 O núcleo geométrico agora possui `TOctree`, `TNoOctree`, `TCubo`, a configuração do domínio e o contrato de classificação. A construção recursiva segue o algoritmo apresentado em aula. Os classificadores de bloco e esfera estão implementados com construção local. A persistência salva e carrega a representação DF em arquivos de texto compatíveis com o formato do professor.
 
 As operações do núcleo já incluem união, escala e cálculo de volume. A união percorre duas árvores de forma sincronizada. A escala transforma as regiões das folhas cheias e reconstrói a ocupação no mesmo domínio. O volume é calculado diretamente por um percurso recursivo da árvore.
+
+`TGeradorAramadoOctree` percorre a árvore e produz as 12 arestas de cada folha cheia. O núcleo gera segmentos independentes de OpenGL. `TRenderizadorAramado`, em `src/UI`, desenha esses segmentos com `GL_LINES` em uma vista ortográfica fixa. A estratégia da janela prepara duas octrees de demonstração, bloco e esfera, e reutiliza seus segmentos a cada quadro. Os controles de criação e operações ainda estão previstos para T12.
 
 ## Arquitetura-alvo
 
@@ -75,6 +78,8 @@ Interface Dear ImGui ─────────┘
 - Oferecer visualização aramada das primitivas.
 - Oferecer visualização da octree como bônus.
 - Não alterar o modelo geométrico.
+- Manter o percurso geométrico separado dos comandos OpenGL.
+- Usar as regiões das folhas cheias, preservando as arestas internas e compartilhadas nesta versão.
 
 ### Interface
 
