@@ -32,6 +32,7 @@ TWindow::~TWindow()
   for (TGancho* hook : hooks) {
     delete hook;
   }
+  delete estrategiaMainLoop;
 }
 
 //----------------------------------------------------------------------------------------------
@@ -96,6 +97,7 @@ bool TWindow::Inicializa()
   }
 
   glfwMakeContextCurrent(instanciaGlfw);
+  glfwSetWindowSizeLimits(instanciaGlfw, 960, 640, GLFW_DONT_CARE, GLFW_DONT_CARE);
   glfwSwapInterval(1);
 
   for (TGancho* hook : hooks) {

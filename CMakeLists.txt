@@ -110,8 +110,9 @@ find_package(OpenGL REQUIRED)
 # --- Alvo do projeto --------------------------------------------------------
 file(GLOB_RECURSE CORE_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/*.cpp)
 file(GLOB_RECURSE PERSISTENCE_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/Persistence/*.cpp)
+file(GLOB_RECURSE APPLICATION_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/Application/*.cpp)
 file(GLOB_RECURSE PROJECT_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
-list(REMOVE_ITEM PROJECT_SRC_FILES ${CORE_SRC_FILES} ${PERSISTENCE_SRC_FILES})
+list(REMOVE_ITEM PROJECT_SRC_FILES ${CORE_SRC_FILES} ${PERSISTENCE_SRC_FILES} ${APPLICATION_SRC_FILES})
 
 add_library(${PROJECT_NAME}_core
     ${CORE_SRC_FILES}
@@ -133,6 +134,15 @@ target_link_libraries(${PROJECT_NAME}_persistence PUBLIC
     ${PROJECT_NAME}_core
 )
 
+add_library(${PROJECT_NAME}_application
+    ${APPLICATION_SRC_FILES}
+)
+
+target_link_libraries(${PROJECT_NAME}_application PUBLIC
+    ${PROJECT_NAME}_core
+    ${PROJECT_NAME}_persistence
+)
+
 add_executable(${PROJECT_NAME}
     ${IMGUI_CORE_FILES}
     ${IMGUI_BACKEND_FILES}
@@ -148,6 +158,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
+    ${PROJECT_NAME}_application
     ${PROJECT_NAME}_core
     ${PROJECT_NAME}_persistence
     glfw

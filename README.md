@@ -16,9 +16,11 @@ O software é um modelador 3D baseado em subdivisão espacial por octree. A impl
 - escala uniforme de octrees em torno da origem;
 - cálculo de volume pelas folhas cheias;
 - visualização aramada de bloco e esfera a partir das folhas cheias;
+- interface para criação, união, escala, arquivos e remoção de modelos;
+- volume, profundidade e quantidade de células cheias do modelo selecionado;
 - testes unitários do núcleo geométrico com GoogleTest.
 
-A aplicação mostra bloco e esfera lado a lado, em aramado e com vista fixa. A criação e a manipulação dos modelos ainda não estão disponíveis pela interface.
+A aplicação apresenta uma lista de modelos, controles agrupados por operação e uma visualização aramada do modelo selecionado, com vista fixa.
 
 ## Tecnologias
 
@@ -70,13 +72,19 @@ Os arquivos gerados pelo CMake devem permanecer em um diretório separado, como 
 
 A aplicação gráfica requer uma sessão X11, WSLg ou outro ambiente gráfico compatível.
 
+Na janela, use **Criar** para definir um bloco ou uma esfera. A profundidade começa em 5 e pode variar de 1 a 8; ela afeta somente novas criações e leituras.
+
+Em **Operar**, selecione duas entradas para união ou aplique escala ao modelo selecionado. Cada resultado entra na lista como um novo modelo e preserva as entradas. O volume aparece automaticamente junto à visualização.
+
+Em **Arquivo**, informe o caminho para abrir ou salvar uma octree no formato DF. Caminhos relativos usam a pasta de execução. A substituição de um arquivo existente pede confirmação.
+
 ## Executar os testes
 
 ```bash
 ctest --test-dir build --output-on-failure
 ```
 
-Os testes do núcleo não abrem janelas nem criam um contexto OpenGL. A suíte atual contém 68 testes.
+Os testes do núcleo e da aplicação não abrem janelas nem criam um contexto OpenGL. A suíte atual contém 84 testes.
 
 Para compilar sem os testes:
 
@@ -99,6 +107,7 @@ cmake --build build-wayland --parallel
 
 ```text
 src/Core/    núcleo geométrico e octree
+src/Application/ modelos e coordenação das operações
 src/Persistence/ persistência da representação DF
 src/UI/      janela e interface gráfica
 test/        testes unitários
@@ -114,4 +123,5 @@ test/        testes unitários
 - A união percorre duas octrees de mesmo domínio e produz uma nova árvore compactada.
 - A escala transforma as folhas cheias e reconstrói a ocupação no domínio configurado.
 - O volume é calculado recursivamente pela soma dos cubos representados pelas folhas cheias.
+- União e escala acrescentam novos modelos à lista, preservando os modelos de entrada.
 - Os algoritmos seguem as abstrações apresentadas em aula e na bibliografia da disciplina.

@@ -13,5 +13,6 @@
 | [0009](0009-dominio-profundidade-e-ordem-dos-octantes.md) | Domínio, profundidade e ordem dos octantes | Aceito |
 | [0010](0010-uniao-e-escala-de-octrees.md) | União e escala de octrees | Aceito |
 | [0011](0011-renderizacao-aramada-das-folhas.md) | Renderização aramada das folhas | Aceito |
+| [0012](0012-integracao-das-operacoes-a-interface.md) | Integração das operações à interface | Aceito |
 
 Estados possíveis: Proposto, Aceito, Substituído e Rejeitado.

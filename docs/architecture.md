@@ -2,14 +2,15 @@
 
 ## Estado atual
 
-O projeto contém uma infraestrutura inicial de aplicação gráfica:
+O projeto contém uma aplicação gráfica com criação e operações sobre octrees:
 
 ```text
 main.cpp
 └── TMainWindow
     └── TWindow
         ├── GLFW / contexto OpenGL
-        ├── Dear ImGui / identificação dos modelos
+        ├── TPainelModelador / controles Dear ImGui
+        │   └── TModelador / lista de modelos e casos de uso
         ├── TRenderizadorAramado / desenho OpenGL
         └── loop de eventos e renderização
 ```
@@ -20,7 +21,9 @@ O núcleo geométrico agora possui `TOctree`, `TNoOctree`, `TCubo`, a configura�
 
 As operações do núcleo já incluem união, escala e cálculo de volume. A união percorre duas árvores de forma sincronizada. A escala transforma as regiões das folhas cheias e reconstrói a ocupação no mesmo domínio. O volume é calculado diretamente por um percurso recursivo da árvore.
 
-`TGeradorAramadoOctree` percorre a árvore e produz as 12 arestas de cada folha cheia. O núcleo gera segmentos independentes de OpenGL. `TRenderizadorAramado`, em `src/UI`, desenha esses segmentos com `GL_LINES` em uma vista ortográfica fixa. A estratégia da janela prepara duas octrees de demonstração, bloco e esfera, e reutiliza seus segmentos a cada quadro. Os controles de criação e operações ainda estão previstos para T12.
+`TGeradorAramadoOctree` percorre a árvore e produz as 12 arestas de cada folha cheia. O núcleo gera segmentos independentes de OpenGL. `TRenderizadorAramado`, em `src/UI`, desenha esses segmentos com `GL_LINES` em uma vista ortográfica fixa.
+
+`TModelador`, em `src/Application`, mantém uma lista de modelos e coordena criação, profundidade, união, escala, arquivo e remoção. Cada `TModeloOctree` guarda nome, identificador, uma octree imutável, suas arestas e seu volume. Os resultados são novos modelos, selecionados automaticamente. `TPainelModelador` apresenta os controles, as informações e os erros; a estratégia da janela chama o painel e o desenho do modelo selecionado a cada quadro.
 
 ## Arquitetura-alvo
 
@@ -64,6 +67,8 @@ Interface Dear ImGui ─────────┘
 - Coordenar casos de uso e validar pré-condições.
 - Manter o modelo ativo e a composição do tema escolhido.
 - Traduzir ações da interface em operações do núcleo.
+- Preparar aramado e volume uma vez ao acrescentar cada modelo.
+- Preservar as entradas de união e escala e manter a seleção por identificador estável.
 
 ### Persistência
 
@@ -85,6 +90,8 @@ Interface Dear ImGui ─────────┘
 
 - Coletar parâmetros, acionar casos de uso e apresentar erros.
 - Não conter algoritmos de octree.
+- Usar profundidade de 1 a 8 para novas criações e leituras, sem reconstruir árvores existentes.
+- Confirmar a substituição de arquivos existentes.
 
 ## Invariantes conhecidos
 
@@ -126,6 +133,7 @@ Parâmetros da primitiva
 ## Qualidade e validação
 
 - Testes do núcleo não devem abrir janela nem criar contexto OpenGL.
+- Testes da aplicação devem cobrir seleção, preservação das entradas, falhas de operações e o fluxo de arquivos.
 - Cada operação deve testar casos com folhas, nós internos e profundidades diferentes.
 - Persistência deve possuir testes de ida e volta e rejeição de strings inválidas.
 - A definição de concluído exigirá compilação e testes em Linux.

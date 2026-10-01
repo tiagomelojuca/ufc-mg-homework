@@ -23,6 +23,8 @@ Este documento consolida as decisões que tomamos a partir do enunciado, das aul
 | União | Vamos percorrer duas octrees de mesmo domínio em ordem sincronizada e compactar o resultado | [ADR-0010](adrs/0010-uniao-e-escala-de-octrees.md) |
 | Escala | Vamos escalar as folhas cheias uniformemente em torno da origem e reconstruir uma nova octree | [ADR-0010](adrs/0010-uniao-e-escala-de-octrees.md) |
 | Aramado | Vamos percorrer a octree e desenhar as 12 arestas de cada folha cheia com OpenGL | [ADR-0011](adrs/0011-renderizacao-aramada-das-folhas.md) |
+| Interface | Vamos manter uma lista de modelos; união e escala acrescentam resultados sem substituir as entradas | [ADR-0012](adrs/0012-integracao-das-operacoes-a-interface.md) |
+| Profundidade interativa | Usaremos valores de 1 a 8 para novas criações e leituras; modelos existentes mantêm suas configurações | [ADR-0012](adrs/0012-integracao-das-operacoes-a-interface.md) |
 
 ## Restrições operacionais
 
