@@ -8,6 +8,7 @@
 
 #include "Core/AramadoOctree.h"
 #include "Core/Bloco.h"
+#include "Core/Cilindro.h"
 #include "Core/Esfera.h"
 #include "Core/SuperficieOctree.h"
 
@@ -28,6 +29,7 @@ class TModeloOctree
     const std::vector<TAresta3D>& Arestas() const;
     const std::vector<TFace3D>& Faces() const;
     double Volume() const;
+    double AreaSuperficial() const;
 
   private:
     int id;
@@ -36,6 +38,7 @@ class TModeloOctree
     std::vector<TAresta3D> arestas;
     std::vector<TFace3D> faces;
     double volume;
+    double areaSuperficial;
 };
 
 //----------------------------------------------------------------------------------------------
@@ -69,13 +72,25 @@ class TModelador
       const TEsfera& esfera,
       const std::string& nome = ""
     );
+    int CriaCilindro(
+      const TCilindro& cilindro,
+      const std::string& nome = ""
+    );
     int Une(
+      int primeira,
+      int segunda
+    );
+    int Intersecta(
       int primeira,
       int segunda
     );
     int Escala(
       int id,
       double fator
+    );
+    int Translada(
+      int id,
+      const TCoordenada3D& deslocamento
     );
     int Abre(
       const std::filesystem::path& arquivo

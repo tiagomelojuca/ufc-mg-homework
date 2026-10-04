@@ -355,3 +355,138 @@ TEST(OperacoesGeometricasOctreeTest, deve_rejeitar_resultado_fora_do_dominio)
 }
 
 //----------------------------------------------------------------------------------------------
+
+TEST(OperacoesBooleanasOctreeTest, deve_aplicar_as_regras_de_intersecao_entre_folhas)
+{
+  const TOctree cheia = CriaOctreeFolha(EEstadoNoOctree::CHEIO);
+  const TOctree vazia = CriaOctreeFolha(EEstadoNoOctree::VAZIO);
+  const TOperacoesBooleanasOctree operacoes;
+
+  EXPECT_EQ(operacoes.Intersecao(cheia, cheia).Raiz().Estado(), EEstadoNoOctree::CHEIO);
+  EXPECT_EQ(operacoes.Intersecao(cheia, vazia).Raiz().Estado(), EEstadoNoOctree::VAZIO);
+  EXPECT_EQ(operacoes.Intersecao(vazia, cheia).Raiz().Estado(), EEstadoNoOctree::VAZIO);
+  EXPECT_EQ(operacoes.Intersecao(vazia, vazia).Raiz().Estado(), EEstadoNoOctree::VAZIO);
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(OperacoesBooleanasOctreeTest, deve_intersectar_nos_parciais_recursivamente)
+{
+  const TConfiguracaoOctree configuracao;
+  const TOctree primeira = CriaOctreeComFilhosCheios(configuracao, 0, 4);
+  const TOctree segunda = CriaOctreeComFilhosCheios(configuracao, 3, 7);
+  const TOctree resultado = TOperacoesBooleanasOctree().Intersecao(primeira, segunda);
+
+  ASSERT_EQ(resultado.Raiz().Estado(), EEstadoNoOctree::PARCIAL);
+  for (std::size_t indice = 0; indice < 8; ++indice) {
+    EXPECT_EQ(
+      resultado.Raiz().Filho(indice).Estado(),
+      indice == 3 || indice == 4 ? EEstadoNoOctree::CHEIO : EEstadoNoOctree::VAZIO
+    );
+  }
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(OperacoesBooleanasOctreeTest, deve_copiar_a_subarvore_quando_o_outro_no_for_cheio)
+{
+  const TConfiguracaoOctree configuracao;
+  const TOctree parcial = CriaOctreeComFilhosCheios(configuracao, 2, 5);
+  const TOctree cheia = CriaOctreeFolha(EEstadoNoOctree::CHEIO);
+  const TOctree resultado = TOperacoesBooleanasOctree().Intersecao(cheia, parcial);
+
+  ASSERT_EQ(resultado.Raiz().Estado(), EEstadoNoOctree::PARCIAL);
+  for (std::size_t indice = 0; indice < 8; ++indice) {
+    EXPECT_EQ(resultado.Raiz().Filho(indice).Estado(), parcial.Raiz().Filho(indice).Estado());
+  }
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(OperacoesBooleanasOctreeTest, deve_compactar_uma_intersecao_vazia)
+{
+  const TConfiguracaoOctree configuracao;
+  const TOctree primeira = CriaOctreeComFilhosCheios(configuracao, 0, 3);
+  const TOctree segunda = CriaOctreeComFilhosCheios(configuracao, 4, 7);
+  const TOctree resultado = TOperacoesBooleanasOctree().Intersecao(primeira, segunda);
+
+  EXPECT_EQ(resultado.Raiz().Estado(), EEstadoNoOctree::VAZIO);
+  EXPECT_TRUE(resultado.Raiz().EhFolha());
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(OperacoesBooleanasOctreeTest, deve_intersectar_de_forma_comutativa_e_rejeitar_dominios_diferentes)
+{
+  const TConfiguracaoOctree configuracao;
+  const TOctree primeira = CriaOctreeComFilhosCheios(configuracao, 1, 6);
+  const TOctree segunda = CriaOctreeComFilhosCheios(configuracao, 4, 7);
+  const TOperacoesBooleanasOctree operacoes;
+  const TOctree ab = operacoes.Intersecao(primeira, segunda);
+  const TOctree ba = operacoes.Intersecao(segunda, primeira);
+
+  for (std::size_t indice = 0; indice < 8; ++indice) {
+    EXPECT_EQ(ab.Raiz().Filho(indice).Estado(), ba.Raiz().Filho(indice).Estado());
+  }
+
+  const TOctree deslocada = CriaOctreeFolha(EEstadoNoOctree::CHEIO, TConfiguracaoOctree(TCubo({ 1.0, 0.0, 0.0 }, 2.0), 5));
+  EXPECT_THROW(operacoes.Intersecao(primeira, deslocada), std::invalid_argument);
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(OperacoesGeometricasOctreeTest, deve_mover_uma_folha_para_o_octante_vizinho)
+{
+  const TConfiguracaoOctree configuracao;
+  const TOctree octree = CriaOctreeComFilhosCheios(configuracao, 0, 0);
+  const TOctree resultado = TOperacoesGeometricasOctree().Translada(octree, { 1.0, 0.0, 0.0 });
+
+  ASSERT_EQ(resultado.Raiz().Estado(), EEstadoNoOctree::PARCIAL);
+  for (std::size_t indice = 0; indice < 8; ++indice) {
+    EXPECT_EQ(resultado.Raiz().Filho(indice).Estado(), indice == 1 ? EEstadoNoOctree::CHEIO : EEstadoNoOctree::VAZIO);
+  }
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(OperacoesGeometricasOctreeTest, deve_preservar_a_arvore_na_translacao_nula)
+{
+  const TConfiguracaoOctree configuracao;
+  const TOctree octree = CriaOctreeComFilhosCheios(configuracao, 2, 5);
+  const TOctree resultado = TOperacoesGeometricasOctree().Translada(octree, { 0.0, 0.0, 0.0 });
+
+  for (std::size_t indice = 0; indice < 8; ++indice) {
+    EXPECT_EQ(resultado.Raiz().Filho(indice).Estado(), octree.Raiz().Filho(indice).Estado());
+  }
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(OperacoesGeometricasOctreeTest, deve_reamostrar_uma_translacao_desalinhada)
+{
+  const TConfiguracaoOctree configuracao(TCubo({ 0.0, 0.0, 0.0 }, 2.0), 2);
+  const TOctree octree = CriaOctreeComFilhosCheios(configuracao, 0, 0);
+  const TOctree resultado = TOperacoesGeometricasOctree().Translada(octree, { 0.5, 0.0, 0.0 });
+
+  // A célula transladada ocupa metade dos octantes 0 e 1; no limite de profundidade, ambos ficam cheios.
+  ASSERT_EQ(resultado.Raiz().Estado(), EEstadoNoOctree::PARCIAL);
+  EXPECT_EQ(resultado.Raiz().Filho(0).Estado(), EEstadoNoOctree::CHEIO);
+  EXPECT_EQ(resultado.Raiz().Filho(1).Estado(), EEstadoNoOctree::CHEIO);
+  EXPECT_EQ(resultado.Raiz().Filho(2).Estado(), EEstadoNoOctree::VAZIO);
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(OperacoesGeometricasOctreeTest, deve_rejeitar_translacao_para_fora_do_dominio_ou_nao_finita)
+{
+  const TConfiguracaoOctree configuracao;
+  const TOctree octree = CriaOctreeComFilhosCheios(configuracao, 0, 0);
+  const TOperacoesGeometricasOctree operacoes;
+
+  EXPECT_THROW(operacoes.Translada(octree, { -0.1, 0.0, 0.0 }), std::invalid_argument);
+  EXPECT_THROW(operacoes.Translada(octree, { 0.0, 2.5, 0.0 }), std::invalid_argument);
+  EXPECT_THROW(operacoes.Translada(octree, { std::numeric_limits<double>::infinity(), 0.0, 0.0 }), std::invalid_argument);
+  EXPECT_NO_THROW(operacoes.Translada(CriaOctreeFolha(EEstadoNoOctree::VAZIO), { 5.0, 0.0, 0.0 }));
+}
+
+//----------------------------------------------------------------------------------------------

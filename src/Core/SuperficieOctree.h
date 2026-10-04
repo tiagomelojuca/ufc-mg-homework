@@ -19,7 +19,7 @@ struct TFace3D
 class TGeradorSuperficieOctree
 {
   public:
-    // Gera as faces das folhas cheias que não estão totalmente encostadas em outra região cheia.
+    // Gera exatamente as partes das faces das folhas cheias que não encostam em outra célula cheia.
     std::vector<TFace3D> Gera(
       const TOctree& octree
     ) const;

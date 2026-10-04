@@ -111,7 +111,7 @@ TEST(SuperficieOctreeTest, deve_omitir_somente_a_face_compartilhada_por_dois_viz
 
 //----------------------------------------------------------------------------------------------
 
-TEST(SuperficieOctreeTest, deve_manter_a_face_encostada_em_um_vizinho_menor)
+TEST(SuperficieOctreeTest, deve_dividir_a_face_encostada_em_um_vizinho_menor)
 {
   const TConfiguracaoOctree configuracao;
   TNoOctree raiz = CriaRaizVaziaSubdividida(configuracao);
@@ -123,12 +123,19 @@ TEST(SuperficieOctreeTest, deve_manter_a_face_encostada_em_um_vizinho_menor)
   const TOctree octree(configuracao, std::move(raiz));
   const auto faces = TGeradorSuperficieOctree().Gera(octree);
 
-  // O octante grande mantém as seis faces; o pequeno omite a face encostada no grande.
-  ASSERT_EQ(faces.size(), 11u);
-  for (std::size_t indice = 0; indice < 6; ++indice) {
+  // A face +X do octante grande é dividida pelos filhos do vizinho: só as três partes livres aparecem.
+  ASSERT_EQ(faces.size(), 13u);
+  for (std::size_t indice = 0; indice < 3; ++indice) {
+    EXPECT_GT(faces[indice].normal.x, 0.0);
+    for (const TCoordenada3D& vertice : faces[indice].vertices) {
+      EXPECT_DOUBLE_EQ(vertice.x, 0.0);
+      EXPECT_FALSE(vertice.y < -0.5 && vertice.z < -0.5);
+    }
+  }
+  for (std::size_t indice = 3; indice < 8; ++indice) {
     VerificaFace(faces[indice], octree.Raiz().Filho(0).Regiao());
   }
-  for (std::size_t indice = 6; indice < faces.size(); ++indice) {
+  for (std::size_t indice = 8; indice < faces.size(); ++indice) {
     VerificaFace(faces[indice], octree.Raiz().Filho(1).Filho(0).Regiao());
     EXPECT_FALSE(faces[indice].normal.x < 0.0);
   }

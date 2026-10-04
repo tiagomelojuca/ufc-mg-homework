@@ -48,8 +48,12 @@ class TPainelModelador
     float centro[3] = { 0.0f, 0.0f, 0.0f };
     float lados[3] = { 1.0f, 1.5f, 0.75f };
     float raio = 0.5f;
+    float altura = 1.0f;
+    int eixo = 1;
     float fatorEscala = 0.5f;
+    float deslocamento[3] = { 0.25f, 0.0f, 0.0f };
     bool solido = false;
+    bool iluminado = true;
     int primeiroOperando = 0;
     int segundoOperando = 0;
     int ultimaSelecao = 0;

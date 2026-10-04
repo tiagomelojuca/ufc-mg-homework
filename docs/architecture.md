@@ -18,17 +18,17 @@ main.cpp
 
 Também existem receitas CMake para baixar GLFW, Dear ImGui e GoogleTest. A configuração, a aplicação gráfica e os testes já foram executados em Linux.
 
-O núcleo geométrico agora possui `TOctree`, `TNoOctree`, `TCubo`, a configuração do domínio e o contrato de classificação. A construção recursiva segue o algoritmo apresentado em aula. Os classificadores de bloco e esfera estão implementados com construção local. A persistência salva e carrega a representação DF em arquivos de texto compatíveis com o formato do professor.
+O núcleo geométrico agora possui `TOctree`, `TNoOctree`, `TCubo`, a configuração do domínio e o contrato de classificação. A construção recursiva segue o algoritmo apresentado em aula. Os classificadores de bloco, esfera e cilindro estão implementados com construção local; o cilindro é alinhado a X, Y ou Z. A persistência salva e carrega a representação DF em arquivos de texto compatíveis com o formato do professor.
 
-As operações do núcleo já incluem união, escala e cálculo de volume. A união percorre duas árvores de forma sincronizada. A escala transforma as regiões das folhas cheias e reconstrói a ocupação no mesmo domínio. O volume é calculado diretamente por um percurso recursivo da árvore.
+As operações do núcleo incluem união, interseção, escala, translação e o cálculo de volume e de área superficial. A união e a interseção percorrem duas árvores de forma sincronizada. A escala e a translação transformam as regiões das folhas cheias e reconstroem a ocupação no mesmo domínio. O volume é calculado diretamente por um percurso recursivo da árvore, e a área é a soma das partes expostas das faces das células cheias.
 
 `TGeradorAramadoOctree` percorre a árvore e produz as 12 arestas de cada folha cheia. O núcleo gera segmentos independentes de OpenGL. `TRenderizadorAramado`, em `src/UI`, desenha esses segmentos com `GL_LINES` em uma vista ortográfica fixa.
 
-`TGeradorSuperficieOctree` gera as faces das folhas cheias que não estão totalmente encostadas em outra região cheia. Quando o checkbox “Sólido” está marcado, `TRenderizadorAramado::DesenhaSolido` preenche essas faces e desenha as arestas visíveis por cima; o padrão continua sendo o aramado.
+`TGeradorSuperficieOctree` gera exatamente as partes expostas das faces das folhas cheias, descendo pelos vizinhos parciais. Quando o checkbox “Sólido” está marcado, `TRenderizadorAramado::DesenhaSolido` preenche essas faces e desenha as arestas visíveis por cima; o padrão continua sendo o aramado. Com “Iluminação” marcado, a cor de cada vértice vem de `TIluminacaoPhong`, que implementa o modelo local de Phong no núcleo.
 
 `TGeradorAramadoOctree::GeraEstrutura` também produz as caixas de todos os nós até um nível escolhido, separadas por estado, e `TAnaliseOctree::ContaNosPorNivel` conta os nós de cada nível. `TJanelaEstruturaOctree` usa essas funções em uma janela flutuante aberta pelo botão “Estrutura da octree”. A cena dessa janela é desenhada por um callback da ImGui, para respeitar a ordem de composição das janelas.
 
-`TModelador`, em `src/Application`, mantém uma lista de modelos e coordena criação, profundidade, união, escala, arquivo e remoção. Cada `TModeloOctree` guarda nome, identificador, uma octree imutável, suas arestas, suas faces e seu volume. Os resultados são novos modelos, selecionados automaticamente. `TPainelModelador` apresenta os controles, as informações e os erros; a estratégia da janela chama o painel e o desenho do modelo selecionado a cada quadro.
+`TModelador`, em `src/Application`, mantém uma lista de modelos e coordena criação, profundidade, união, interseção, escala, translação, arquivo e remoção. Cada `TModeloOctree` guarda nome, identificador, uma octree imutável, suas arestas, suas faces, seu volume e sua área superficial. Os resultados são novos modelos, selecionados automaticamente. `TPainelModelador` apresenta os controles, as informações e os erros; a estratégia da janela chama o painel e o desenho do modelo selecionado a cada quadro.
 
 ## Arquitetura-alvo
 
@@ -85,7 +85,7 @@ Interface Dear ImGui ─────────┘
 ### Renderização
 
 - Converter o estado do modelo em comandos gráficos.
-- Oferecer visualização aramada das primitivas como padrão e visualização sólida opcional.
+- Oferecer visualização aramada das primitivas como padrão e visualização sólida opcional, com iluminação local.
 - Oferecer visualização da octree como bônus, em uma janela flutuante que não ocupa a interface principal.
 - Não alterar o modelo geométrico.
 - Manter o percurso geométrico separado dos comandos OpenGL.
@@ -113,12 +113,15 @@ Interface Dear ImGui ─────────┘
 - A classificação da esfera compara o raio com as distâncias da célula mais próxima e mais distante do centro.
 - Operações booleanas percorrem árvores de forma sincronizada e exigem espaços compatíveis.
 - A união aceita profundidades diferentes, produz uma árvore com a maior profundidade configurada e compacta filhos homogêneos.
+- A interseção é vazia onde qualquer uma das entradas for vazia e segue as mesmas regras de domínio, profundidade e compactação da união.
 - A escala é uniforme, usa a origem como ponto fixo e aceita somente fatores finitos e positivos.
+- A translação aceita somente deslocamentos finitos e reamostra as folhas cheias na profundidade configurada.
 - A escala transforma as folhas cheias da octree, não as primitivas usadas na construção inicial.
 - Uma operação geométrica é rejeitada quando o volume transformado ultrapassa o domínio.
 - Uma folha vazia contribui com volume zero e uma folha cheia contribui com o cubo do lado de sua região.
 - O volume de um nó parcial é a soma dos volumes dos oito filhos.
 - O volume calculado corresponde às células representadas pela octree e mantém a aproximação definida pela profundidade da árvore.
+- A área superficial é a área do contorno das células cheias; faces encostadas em células cheias não contam, e faces na fronteira do domínio contam.
 - A representação persistida percorre a árvore em profundidade primeiro.
 - O arquivo DF contém somente os símbolos `B`, `W` e `(`, sem cabeçalho, separadores ou marcador de fechamento.
 - Cada `(` deve ser seguido pelas representações de exatamente oito filhos.

@@ -10,15 +10,15 @@ O software é um modelador 3D baseado em subdivisão espacial por octree. A impl
 - octree local com nós cheios, vazios e parciais;
 - domínio e profundidade máxima configuráveis;
 - construção recursiva baseada no algoritmo apresentado em aula;
-- geração de octrees para blocos e esferas;
+- geração de octrees para blocos, esferas e cilindros alinhados aos eixos (cilindro: bônus);
 - persistência textual de octrees no formato DF;
-- união de octrees com domínios compatíveis;
-- escala uniforme de octrees em torno da origem;
-- cálculo de volume pelas folhas cheias;
+- união e interseção de octrees com domínios compatíveis (interseção: bônus);
+- escala uniforme em torno da origem e translação de octrees (translação: bônus);
+- cálculo de volume pelas folhas cheias e de área superficial pelo contorno das células (área: bônus);
 - visualização aramada de bloco e esfera a partir das folhas cheias;
 - interface para criação, união, escala, arquivos e remoção de modelos;
 - volume, profundidade e quantidade de células cheias do modelo selecionado;
-- visualização sólida opcional, com o aramado como padrão;
+- visualização sólida opcional, com o aramado como padrão, e iluminação local de Phong (iluminação: bônus);
 - inspeção da estrutura completa da octree em uma janela flutuante (bônus);
 - testes unitários do núcleo geométrico com GoogleTest.
 
@@ -74,13 +74,13 @@ Os arquivos gerados pelo CMake devem permanecer em um diretório separado, como 
 
 A aplicação gráfica requer uma sessão X11, WSLg ou outro ambiente gráfico compatível.
 
-Na janela, use **Criar** para definir um bloco ou uma esfera. A profundidade começa em 5 e pode variar de 1 a 8; ela afeta somente novas criações e leituras.
+Na janela, use **Criar** para definir um bloco, uma esfera ou um cilindro. A profundidade começa em 5 e pode variar de 1 a 8; ela afeta somente novas criações e leituras.
 
-Em **Operar**, selecione duas entradas para união ou aplique escala ao modelo selecionado. Cada resultado entra na lista como um novo modelo e preserva as entradas. O volume aparece automaticamente junto à visualização.
+Em **Operar**, selecione duas entradas para união ou interseção, ou aplique escala ou translação ao modelo selecionado. Cada resultado entra na lista como um novo modelo e preserva as entradas. O volume e a área superficial aparecem automaticamente junto à visualização.
 
 Em **Arquivo**, informe o caminho para abrir ou salvar uma octree no formato DF. Caminhos relativos usam a pasta de execução. A substituição de um arquivo existente pede confirmação.
 
-Marque **Sólido**, acima da visualização, para preencher as faces externas do modelo; desmarcado, a visualização volta ao aramado.
+Marque **Sólido**, acima da visualização, para preencher as faces externas do modelo; desmarcado, a visualização volta ao aramado. No modo sólido, **Iluminação** aplica o modelo de Phong com uma luz pontual.
 
 O botão **Estrutura da octree**, acima da visualização, abre uma janela flutuante com todos os nós do modelo selecionado: árvore navegável, quantidade de nós por nível e aramado colorido por estado. Clique em um nó da árvore para enquadrá-lo.
 
@@ -90,7 +90,7 @@ O botão **Estrutura da octree**, acima da visualização, abre uma janela flutu
 ctest --test-dir build --output-on-failure
 ```
 
-Os testes do núcleo e da aplicação não abrem janelas nem criam um contexto OpenGL. A suíte atual contém 98 testes.
+Os testes do núcleo e da aplicação não abrem janelas nem criam um contexto OpenGL. A suíte atual contém 128 testes.
 
 Para compilar sem os testes:
 

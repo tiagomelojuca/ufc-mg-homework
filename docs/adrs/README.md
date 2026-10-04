@@ -16,5 +16,6 @@
 | [0012](0012-integracao-das-operacoes-a-interface.md) | Integração das operações à interface | Aceito |
 | [0013](0013-visualizacao-da-estrutura-da-octree.md) | Visualização da estrutura da octree | Aceito |
 | [0014](0014-visualizacao-solida-opcional.md) | Visualização sólida opcional | Aceito |
+| [0015](0015-bonus-de-mestrado.md) | Bônus de mestrado | Aceito |
 
 Estados possíveis: Proposto, Aceito, Substituído e Rejeitado.

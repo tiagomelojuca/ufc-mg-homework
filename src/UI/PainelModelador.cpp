@@ -222,7 +222,7 @@ void TPainelModelador::DesenhaCriacao()
     ImGui::TableSetupColumn("Rotulo", ImGuiTableColumnFlags_WidthFixed, 66.0f);
     ImGui::TableSetupColumn("Valor", ImGuiTableColumnFlags_WidthStretch);
     Campo("Tipo");
-    ImGui::Combo("##primitiva", &primitiva, "Bloco\0Esfera\0");
+    ImGui::Combo("##primitiva", &primitiva, "Bloco\0Esfera\0Cilindro\0");
     Campo("Nome");
     ImGui::InputTextWithHint("##nome", "Opcional", &nome);
     Campo("Centro");
@@ -234,15 +234,24 @@ void TPainelModelador::DesenhaCriacao()
       Campo("Raio");
       ImGui::InputFloat("##raio", &raio, 0.0f, 0.0f, "%.3f");
     }
+    if (primitiva == 2) {
+      Campo("Altura");
+      ImGui::InputFloat("##altura", &altura, 0.0f, 0.0f, "%.3f");
+      Campo("Eixo");
+      ImGui::Combo("##eixo", &eixo, "X\0Y\0Z\0");
+    }
     ImGui::EndTable();
   }
-  if (BotaoPrincipal(primitiva == 0 ? "Criar bloco" : "Criar esfera")) {
+  const char* rotulosCriacao[] = { "Criar bloco", "Criar esfera", "Criar cilindro" };
+  if (BotaoPrincipal(rotulosCriacao[primitiva])) {
     ExecutaAcao([this] {
       const TCoordenada3D ponto = { centro[0], centro[1], centro[2] };
       if (primitiva == 0) {
         modelador.CriaBloco(TBloco(ponto, lados[0], lados[1], lados[2]), nome);
-      } else {
+      } else if (primitiva == 1) {
         modelador.CriaEsfera(TEsfera(ponto, raio), nome);
+      } else {
+        modelador.CriaCilindro(TCilindro(ponto, raio, altura, static_cast<EEixo>(eixo)), nome);
       }
     }, "Modelo criado e selecionado.");
   }
@@ -279,15 +288,20 @@ bool TPainelModelador::EscolheModelo(
 
 void TPainelModelador::DesenhaOperacoes()
 {
-  Rotulo("UNIÃO · DOIS MODELOS");
+  Rotulo("UNIÃO E INTERSEÇÃO · DOIS MODELOS");
   if (segundoOperando == 0 && modelador.Modelos().size() > 1) {
     segundoOperando = modelador.Modelos()[1].Id();
   }
   EscolheModelo("##primeiro", primeiroOperando);
   EscolheModelo("##segundo", segundoOperando);
   ImGui::BeginDisabled(primeiroOperando == 0 || segundoOperando == 0);
-  if (BotaoPrincipal("Unir modelos")) {
+  const float larguraBotao = (ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x) / 2.0f;
+  if (ImGui::Button("Unir", ImVec2(larguraBotao, 36.0f))) {
     ExecutaAcao([this] { modelador.Une(primeiroOperando, segundoOperando); }, "União criada. Os modelos de entrada foram preservados.");
+  }
+  ImGui::SameLine();
+  if (ImGui::Button("Intersectar", ImVec2(larguraBotao, 36.0f))) {
+    ExecutaAcao([this] { modelador.Intersecta(primeiroOperando, segundoOperando); }, "Interseção criada. Os modelos de entrada foram preservados.");
   }
   ImGui::EndDisabled();
   ImGui::Separator();
@@ -300,6 +314,20 @@ void TPainelModelador::DesenhaOperacoes()
   ImGui::BeginDisabled(modelador.Selecionado() == nullptr);
   if (BotaoPrincipal("Aplicar escala")) {
     ExecutaAcao([this] { modelador.Escala(modelador.Selecionado()->Id(), fatorEscala); }, "Modelo escalado criado. O modelo original foi preservado.");
+  }
+  ImGui::EndDisabled();
+  ImGui::Separator();
+  Rotulo("TRANSLAÇÃO · MODELO SELECIONADO");
+  ImGui::SetNextItemWidth(-1.0f);
+  ImGui::InputFloat3("##deslocamento", deslocamento, "%.3f");
+  if (ImGui::IsItemHovered()) {
+    ImGui::SetTooltip("Deslocamento em X / Y / Z. Gera um novo modelo, que precisa continuar dentro do domínio.");
+  }
+  ImGui::BeginDisabled(modelador.Selecionado() == nullptr);
+  if (BotaoPrincipal("Aplicar translação")) {
+    ExecutaAcao([this] {
+      modelador.Translada(modelador.Selecionado()->Id(), { deslocamento[0], deslocamento[1], deslocamento[2] });
+    }, "Modelo transladado criado. O modelo original foi preservado.");
   }
   ImGui::EndDisabled();
 }
@@ -375,16 +403,27 @@ void TPainelModelador::DesenhaVisualizacao()
   const TModeloOctree* modelo = modelador.Selecionado();
   Titulo(modelo == nullptr ? "Visualização" : modelo->Nome().c_str());
   const char* rotuloSolido = "Sólido";
+  const char* rotuloIluminacao = "Iluminação";
   const char* rotuloEstrutura = "Estrutura da octree";
   const ImGuiStyle& estilo = ImGui::GetStyle();
-  const float larguraSolido = ImGui::GetFrameHeight() + estilo.ItemInnerSpacing.x + ImGui::CalcTextSize(rotuloSolido).x;
+  const auto larguraCheckbox = [&estilo](const char* rotulo) {
+    return ImGui::GetFrameHeight() + estilo.ItemInnerSpacing.x + ImGui::CalcTextSize(rotulo).x;
+  };
   const float larguraEstrutura = ImGui::CalcTextSize(rotuloEstrutura).x + 2.0f * estilo.FramePadding.x;
+  const float larguraControles = larguraCheckbox(rotuloSolido) + larguraCheckbox(rotuloIluminacao) + larguraEstrutura + estilo.ItemSpacing.x * 3.0f;
   ImGui::SameLine();
-  ImGui::SetCursorPosX(ImGui::GetCursorPosX() + std::max(0.0f, ImGui::GetContentRegionAvail().x - larguraSolido - estilo.ItemSpacing.x * 2.0f - larguraEstrutura));
+  ImGui::SetCursorPosX(ImGui::GetCursorPosX() + std::max(0.0f, ImGui::GetContentRegionAvail().x - larguraControles));
   ImGui::Checkbox(rotuloSolido, &solido);
   if (ImGui::IsItemHovered()) {
     ImGui::SetTooltip("Preenche as faces externas das folhas cheias. Desmarcado, mostra o aramado.");
   }
+  ImGui::SameLine();
+  ImGui::BeginDisabled(!solido);
+  ImGui::Checkbox(rotuloIluminacao, &iluminado);
+  if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+    ImGui::SetTooltip("Modelo local de Phong com uma luz pontual, calculado em cada vértice. Disponível no modo sólido.");
+  }
+  ImGui::EndDisabled();
   ImGui::SameLine(0.0f, estilo.ItemSpacing.x * 2.0f);
   ImGui::BeginDisabled(modelo == nullptr);
   if (ImGui::Button(rotuloEstrutura)) {
@@ -395,15 +434,18 @@ void TPainelModelador::DesenhaVisualizacao()
   }
   ImGui::EndDisabled();
   Rotulo(solido ? "SUPERFÍCIE · FOLHAS CHEIAS DA OCTREE" : "ARAMADO · FOLHAS CHEIAS DA OCTREE");
-  const float larguraCartao = (ImGui::GetContentRegionAvail().x - 20.0f) / 3.0f;
+  const float larguraCartao = (ImGui::GetContentRegionAvail().x - 30.0f) / 4.0f;
   const std::string volume = modelo == nullptr ? "--" : std::to_string(modelo->Volume()) + " u³";
   const std::string profundidadeModelo = modelo == nullptr ? "--" : std::to_string(modelo->Octree().Configuracao().ProfundidadeMaxima());
   const std::string celulas = modelo == nullptr ? "--" : std::to_string(modelo->Arestas().size() / 12);
+  const std::string area = modelo == nullptr ? "--" : std::to_string(modelo->AreaSuperficial()) + " u²";
   Cartao("Volume", volume.c_str(), larguraCartao);
   ImGui::SameLine();
   Cartao("Profundidade", profundidadeModelo.c_str(), larguraCartao);
   ImGui::SameLine();
   Cartao("Células cheias", celulas.c_str(), larguraCartao);
+  ImGui::SameLine();
+  Cartao("Área superficial", area.c_str(), larguraCartao);
 
   posicaoCena = ImGui::GetCursorScreenPos();
   tamanhoCena = ImVec2(ImGui::GetContentRegionAvail().x, std::max(1.0f, ImGui::GetContentRegionAvail().y - 34.0f));
@@ -438,7 +480,7 @@ void TPainelModelador::DesenhaModelo(
   const int altura = static_cast<int>(tamanhoCena.y * escalaY);
   const TCubo& dominio = modelo->Octree().Configuracao().Dominio();
   if (solido) {
-    TRenderizadorAramado().DesenhaSolido(modelo->Faces(), modelo->Arestas(), dominio, x, y, largura, altura);
+    TRenderizadorAramado().DesenhaSolido(modelo->Faces(), modelo->Arestas(), dominio, iluminado, x, y, largura, altura);
   } else {
     TRenderizadorAramado().Desenha(modelo->Arestas(), dominio, x, y, largura, altura);
   }

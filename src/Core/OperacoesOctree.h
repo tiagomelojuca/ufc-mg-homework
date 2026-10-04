@@ -12,6 +12,11 @@ class TOperacoesBooleanasOctree
       const TOctree& primeira,
       const TOctree& segunda
     ) const;
+
+    TOctree Intersecao(
+      const TOctree& primeira,
+      const TOctree& segunda
+    ) const;
 };
 
 //----------------------------------------------------------------------------------------------
@@ -22,6 +27,11 @@ class TOperacoesGeometricasOctree
     TOctree Escala(
       const TOctree& octree,
       double fator
+    ) const;
+
+    TOctree Translada(
+      const TOctree& octree,
+      const TCoordenada3D& deslocamento
     ) const;
 };
 

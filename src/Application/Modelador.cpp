@@ -33,7 +33,8 @@ TModeloOctree::TModeloOctree(
   octree(std::make_shared<const TOctree>(std::move(octree))),
   arestas(TGeradorAramadoOctree().Gera(*this->octree)),
   faces(TGeradorSuperficieOctree().Gera(*this->octree)),
-  volume(TAnaliseOctree().CalculaVolume(*this->octree))
+  volume(TAnaliseOctree().CalculaVolume(*this->octree)),
+  areaSuperficial(TAnaliseOctree().CalculaAreaSuperficial(faces))
 {
 }
 
@@ -67,6 +68,11 @@ const std::vector<TFace3D>& TModeloOctree::Faces() const
 double TModeloOctree::Volume() const
 {
   return volume;
+}
+
+double TModeloOctree::AreaSuperficial() const
+{
+  return areaSuperficial;
 }
 
 //----------------------------------------------------------------------------------------------
@@ -163,6 +169,20 @@ int TModelador::CriaEsfera(
   return Adiciona(std::move(octree), nome.empty() ? "Esfera" : nome);
 }
 
+int TModelador::CriaCilindro(
+  const TCilindro& cilindro,
+  const std::string& nome
+)
+{
+  ValidaCentro(cilindro.Centro());
+  if (!std::isfinite(cilindro.Raio()) || !std::isfinite(cilindro.Altura())) {
+    throw std::invalid_argument("O raio e a altura do cilindro devem ser finitos");
+  }
+  TOctree octree(configuracao);
+  octree.Constroi(TClassificadorCilindroOctree(cilindro));
+  return Adiciona(std::move(octree), nome.empty() ? "Cilindro" : nome);
+}
+
 int TModelador::Une(
   int primeira,
   int segunda
@@ -172,6 +192,15 @@ int TModelador::Une(
   return Adiciona(std::move(octree), "União");
 }
 
+int TModelador::Intersecta(
+  int primeira,
+  int segunda
+)
+{
+  TOctree octree = TOperacoesBooleanasOctree().Intersecao(Modelo(primeira).Octree(), Modelo(segunda).Octree());
+  return Adiciona(std::move(octree), "Interseção");
+}
+
 int TModelador::Escala(
   int id,
   double fator
@@ -179,6 +208,15 @@ int TModelador::Escala(
 {
   TOctree octree = TOperacoesGeometricasOctree().Escala(Modelo(id).Octree(), fator);
   return Adiciona(std::move(octree), "Escala");
+}
+
+int TModelador::Translada(
+  int id,
+  const TCoordenada3D& deslocamento
+)
+{
+  TOctree octree = TOperacoesGeometricasOctree().Translada(Modelo(id).Octree(), deslocamento);
+  return Adiciona(std::move(octree), "Translação");
 }
 
 //----------------------------------------------------------------------------------------------

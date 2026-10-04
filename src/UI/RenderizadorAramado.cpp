@@ -1,9 +1,25 @@
 #include "RenderizadorAramado.h"
 
+#include <cmath>
+
 #include <GLFW/glfw3.h>
+
+#include "Core/IluminacaoPhong.h"
 
 namespace
 {
+  constexpr double ANGULO_X = 25.0;
+  constexpr double ANGULO_Y = -35.0;
+  constexpr double PI = 3.14159265358979323846;
+
+  // Direção do observador no espaço do modelo: inversa da rotação da câmera aplicada a (0, 0, 1).
+  TCoordenada3D DirecaoObservador()
+  {
+    const double x = ANGULO_X * PI / 180.0;
+    const double y = ANGULO_Y * PI / 180.0;
+    return { -std::cos(x) * std::sin(y), std::sin(x), std::cos(x) * std::cos(y) };
+  }
+
   // Prepara viewport, recorte, profundidade e a vista ortográfica fixa; restaura tudo ao sair.
   class TCenaOpenGL
   {
@@ -42,8 +58,8 @@ namespace
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
         glLoadIdentity();
-        glRotated(25.0, 1.0, 0.0, 0.0);
-        glRotated(-35.0, 0.0, 1.0, 0.0);
+        glRotated(ANGULO_X, 1.0, 0.0, 0.0);
+        glRotated(ANGULO_Y, 0.0, 1.0, 0.0);
         glTranslated(-enquadramento.Centro().x, -enquadramento.Centro().y, -enquadramento.Centro().z);
       }
 
@@ -142,6 +158,7 @@ void TRenderizadorAramado::DesenhaSolido(
   const std::vector<TFace3D>& faces,
   const std::vector<TAresta3D>& arestas,
   const TCubo& dominio,
+  bool iluminado,
   int x,
   int y,
   int largura,
@@ -153,6 +170,15 @@ void TRenderizadorAramado::DesenhaSolido(
     return;
   }
 
+  // Luz pontual acima, à frente e à esquerda do observador, proporcional ao domínio.
+  const TCoordenada3D& centro = dominio.Centro();
+  const double lado = dominio.Lado();
+  const TIluminacaoPhong iluminacao(
+    { centro.x - 0.4 * lado, centro.y + 1.3 * lado, centro.z + 1.1 * lado },
+    DirecaoObservador()
+  );
+  const TCorRGB corBase = { 0.25, 0.72, 0.88 };
+
   const TCenaOpenGL cena(dominio, area, area);
   // Afasta as faces para que as arestas visíveis vençam o teste de profundidade.
   glEnable(GL_POLYGON_OFFSET_FILL);
@@ -160,8 +186,13 @@ void TRenderizadorAramado::DesenhaSolido(
   glBegin(GL_QUADS);
   for (const TFace3D& face : faces) {
     const float tom = TomFace(face.normal);
-    glColor3f(0.20f * tom, 0.62f * tom, 0.78f * tom);
     for (const TCoordenada3D& vertice : face.vertices) {
+      if (iluminado) {
+        const TCorRGB cor = iluminacao.Calcula(vertice, face.normal, corBase);
+        glColor3d(cor.r, cor.g, cor.b);
+      } else {
+        glColor3f(0.20f * tom, 0.62f * tom, 0.78f * tom);
+      }
       glVertex3d(vertice.x, vertice.y, vertice.z);
     }
   }

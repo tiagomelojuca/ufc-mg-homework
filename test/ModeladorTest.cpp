@@ -260,3 +260,69 @@ TEST_F(TModeladorTest, deve_copiar_o_estado_da_estrategia_sem_mutar_modelos_comp
 }
 
 //----------------------------------------------------------------------------------------------
+
+TEST_F(TModeladorTest, deve_criar_um_cilindro_e_calcular_sua_area)
+{
+  const int id = modelador.CriaCilindro(TCilindro({ 0.0, 0.0, 0.0 }, 0.5, 1.0, EEixo::Z));
+
+  ASSERT_NE(modelador.Selecionado(), nullptr);
+  EXPECT_EQ(modelador.Selecionado()->Id(), id);
+  EXPECT_EQ(modelador.Selecionado()->Nome(), "Cilindro 1");
+  EXPECT_GT(modelador.Selecionado()->Volume(), 0.0);
+  EXPECT_GT(modelador.Selecionado()->AreaSuperficial(), 0.0);
+  EXPECT_THROW(modelador.CriaCilindro(TCilindro({ 0.0, 0.0, 0.0 }, 0.5, 3.0)), std::invalid_argument);
+  EXPECT_EQ(modelador.Modelos().size(), 1u);
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST_F(TModeladorTest, deve_calcular_a_area_superficial_ao_acrescentar_o_modelo)
+{
+  modelador.CriaBloco(TBloco({ -0.5, -0.5, -0.5 }, 1.0, 1.0, 1.0));
+
+  EXPECT_DOUBLE_EQ(modelador.Selecionado()->AreaSuperficial(), 6.0);
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST_F(TModeladorTest, deve_acrescentar_a_intersecao_preservando_as_entradas)
+{
+  const int primeiro = modelador.CriaBloco(TBloco({ -0.5, -0.5, -0.5 }, 1.0, 1.0, 1.0));
+  const int segundo = modelador.CriaBloco(TBloco({ 0.0, -0.5, -0.5 }, 1.0, 1.0, 1.0));
+  const int intersecao = modelador.Intersecta(primeiro, segundo);
+
+  ASSERT_EQ(modelador.Modelos().size(), 3u);
+  EXPECT_EQ(modelador.Selecionado()->Id(), intersecao);
+  EXPECT_EQ(modelador.Selecionado()->Nome(), "Interseção 3");
+  EXPECT_DOUBLE_EQ(modelador.Selecionado()->Volume(), 0.5);
+  EXPECT_DOUBLE_EQ(modelador.Modelo(primeiro).Volume(), 1.0);
+  EXPECT_DOUBLE_EQ(modelador.Modelo(segundo).Volume(), 1.0);
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST_F(TModeladorTest, deve_acrescentar_a_translacao_preservando_o_original)
+{
+  const int original = modelador.CriaBloco(TBloco({ -0.5, -0.5, -0.5 }, 1.0, 1.0, 1.0));
+  const int transladado = modelador.Translada(original, { 1.0, 0.0, 0.0 });
+
+  ASSERT_EQ(modelador.Modelos().size(), 2u);
+  EXPECT_EQ(modelador.Selecionado()->Id(), transladado);
+  EXPECT_EQ(modelador.Selecionado()->Nome(), "Translação 2");
+  EXPECT_DOUBLE_EQ(modelador.Selecionado()->Volume(), 1.0);
+  EXPECT_DOUBLE_EQ(modelador.Modelo(original).Octree().Raiz().Filho(0).Regiao().Centro().x, -0.5);
+  EXPECT_EQ(modelador.Selecionado()->Octree().Raiz().Filho(1).Estado(), EEstadoNoOctree::CHEIO);
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST_F(TModeladorTest, deve_preservar_estado_quando_a_translacao_falha)
+{
+  const int original = modelador.CriaBloco(TBloco({ -0.5, -0.5, -0.5 }, 1.0, 1.0, 1.0));
+
+  EXPECT_THROW(modelador.Translada(original, { -1.0, 0.0, 0.0 }), std::invalid_argument);
+  EXPECT_EQ(modelador.Modelos().size(), 1u);
+  EXPECT_EQ(modelador.Selecionado()->Id(), original);
+}
+
+//----------------------------------------------------------------------------------------------

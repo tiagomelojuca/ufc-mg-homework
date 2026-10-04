@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "Octree.h"
+#include "SuperficieOctree.h"
 
 //----------------------------------------------------------------------------------------------
 
@@ -22,6 +23,15 @@ class TAnaliseOctree
   public:
     double CalculaVolume(
       const TOctree& octree
+    ) const;
+
+    // Área do contorno das células cheias, isto é, da aproximação representada pela octree.
+    double CalculaAreaSuperficial(
+      const TOctree& octree
+    ) const;
+
+    double CalculaAreaSuperficial(
+      const std::vector<TFace3D>& faces
     ) const;
 
     std::vector<TContagemNivelOctree> ContaNosPorNivel(

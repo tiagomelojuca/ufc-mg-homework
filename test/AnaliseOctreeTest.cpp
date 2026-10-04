@@ -210,3 +210,59 @@ TEST(AnaliseOctreeTest, deve_contar_os_niveis_a_partir_de_um_no_interno)
 }
 
 //----------------------------------------------------------------------------------------------
+
+TEST(AnaliseOctreeTest, deve_calcular_a_area_superficial_de_um_cubo)
+{
+  const TAnaliseOctree analise;
+
+  EXPECT_DOUBLE_EQ(analise.CalculaAreaSuperficial(CriaOctreeFolha(EEstadoNoOctree::CHEIO)), 24.0);
+  EXPECT_DOUBLE_EQ(analise.CalculaAreaSuperficial(CriaOctreeFolha(EEstadoNoOctree::VAZIO)), 0.0);
+  EXPECT_DOUBLE_EQ(analise.CalculaAreaSuperficial(CriaOctreeComOctanteCheio(TConfiguracaoOctree(), 5)), 6.0);
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(AnaliseOctreeTest, deve_desconsiderar_faces_internas_na_area_superficial)
+{
+  const TConfiguracaoOctree configuracao;
+  TNoOctree raiz(configuracao.Dominio(), EEstadoNoOctree::PARCIAL);
+  for (std::size_t indice = 0; indice < 8; ++indice) {
+    raiz.Filho(indice).DefineEstado(indice < 2 ? EEstadoNoOctree::CHEIO : EEstadoNoOctree::VAZIO);
+  }
+  const TOctree octree(configuracao, std::move(raiz));
+
+  // Dois cubos unitários lado a lado formam uma caixa 2 x 1 x 1.
+  EXPECT_DOUBLE_EQ(TAnaliseOctree().CalculaAreaSuperficial(octree), 10.0);
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(AnaliseOctreeTest, deve_descontar_somente_a_parte_encostada_em_um_vizinho_menor)
+{
+  const TConfiguracaoOctree configuracao;
+  TNoOctree raiz(configuracao.Dominio(), EEstadoNoOctree::PARCIAL);
+  for (std::size_t indice = 0; indice < 8; ++indice) {
+    raiz.Filho(indice).DefineEstado(EEstadoNoOctree::VAZIO);
+  }
+  raiz.Filho(0).DefineEstado(EEstadoNoOctree::CHEIO);
+  raiz.Filho(1).DefineEstado(EEstadoNoOctree::PARCIAL);
+  for (std::size_t indice = 0; indice < 8; ++indice) {
+    raiz.Filho(1).Filho(indice).DefineEstado(indice == 0 ? EEstadoNoOctree::CHEIO : EEstadoNoOctree::VAZIO);
+  }
+  const TOctree octree(configuracao, std::move(raiz));
+
+  // Cubo de lado 1 (área 6) mais cubo de lado 0,5 (área 1,5), menos duas vezes o contato de 0,25.
+  EXPECT_DOUBLE_EQ(TAnaliseOctree().CalculaAreaSuperficial(octree), 7.0);
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(AnaliseOctreeTest, deve_calcular_a_mesma_area_antes_e_depois_da_compactacao)
+{
+  const TConfiguracaoOctree configuracao;
+  const TOctree subdividida(configuracao, TNoOctree(configuracao.Dominio(), EEstadoNoOctree::PARCIAL));
+
+  EXPECT_DOUBLE_EQ(TAnaliseOctree().CalculaAreaSuperficial(subdividida), 24.0);
+}
+
+//----------------------------------------------------------------------------------------------

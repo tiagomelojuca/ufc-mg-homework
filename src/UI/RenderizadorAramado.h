@@ -46,11 +46,13 @@ class TRenderizadorAramado
       const TRetanguloTela& recorte
     ) const;
 
-    // Preenche as faces com um tom por orientação e desenha as arestas por cima.
+    // Preenche as faces e desenha as arestas por cima. Sem iluminação, usa um tom fixo por orientação;
+    // com iluminação, aplica o modelo de Phong em cada vértice.
     void DesenhaSolido(
       const std::vector<TFace3D>& faces,
       const std::vector<TAresta3D>& arestas,
       const TCubo& dominio,
+      bool iluminado,
       int x,
       int y,
       int largura,

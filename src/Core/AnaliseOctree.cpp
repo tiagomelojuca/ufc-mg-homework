@@ -1,5 +1,7 @@
 #include "AnaliseOctree.h"
 
+#include <cmath>
+
 namespace
 {
   double CalculaVolumeNo(
@@ -71,6 +73,35 @@ std::vector<TContagemNivelOctree> TAnaliseOctree::ContaNosPorNivel(
   std::vector<TContagemNivelOctree> contagens;
   ContaNo(raiz, 0, contagens);
   return contagens;
+}
+
+//
+
+//----------------------------------------------------------------------------------------------
+
+double TAnaliseOctree::CalculaAreaSuperficial(
+  const TOctree& octree
+) const
+{
+  return CalculaAreaSuperficial(TGeradorSuperficieOctree().Gera(octree));
+}
+
+//----------------------------------------------------------------------------------------------
+
+double TAnaliseOctree::CalculaAreaSuperficial(
+  const std::vector<TFace3D>& faces
+) const
+{
+  double area = 0.0;
+
+  for (const TFace3D& face : faces) {
+    const TCoordenada3D& a = face.vertices[0];
+    const TCoordenada3D& b = face.vertices[1];
+    const double lado = std::abs(b.x - a.x) + std::abs(b.y - a.y) + std::abs(b.z - a.z);
+    area += lado * lado;
+  }
+
+  return area;
 }
 
 //----------------------------------------------------------------------------------------------

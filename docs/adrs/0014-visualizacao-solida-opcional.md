@@ -23,6 +23,6 @@ A janela de estrutura da octree (ADR-0013) continua somente em aramado.
 
 - O aramado continua sendo a visualização padrão.
 - A forma fica legível sem esconder a divisão em células, pois as arestas visíveis continuam desenhadas.
-- Omitimos a maior parte das faces internas; ainda podem restar faces encostadas em vizinhos menores, escondidas pelo teste de profundidade.
+- Omitimos a maior parte das faces internas; ainda podem restar faces encostadas em vizinhos menores, escondidas pelo teste de profundidade. A [ADR-0015](0015-bonus-de-mestrado.md) passou a gerar somente as partes expostas das faces.
 - Cada modelo guarda as faces, além das arestas.
 - Continuamos com a vista ortográfica fixa e a API clássica do OpenGL.

@@ -26,6 +26,11 @@ Este documento consolida as decisões que tomamos a partir do enunciado, das aul
 | Interface | Vamos manter uma lista de modelos; união e escala acrescentam resultados sem substituir as entradas | [ADR-0012](adrs/0012-integracao-das-operacoes-a-interface.md) |
 | Estrutura da octree | Vamos inspecionar todos os nós em uma janela flutuante aberta por um botão, com árvore, contagens por nível e aramado colorido por estado | [ADR-0013](adrs/0013-visualizacao-da-estrutura-da-octree.md) |
 | Visualização sólida | Vamos oferecer faces preenchidas das folhas cheias por um checkbox, mantendo o aramado como padrão | [ADR-0014](adrs/0014-visualizacao-solida-opcional.md) |
+| Cilindro | Vamos usar um cilindro alinhado a X, Y ou Z, parametrizado por centro, raio, altura e eixo | [ADR-0015](adrs/0015-bonus-de-mestrado.md) |
+| Interseção | Vamos percorrer as duas octrees em ordem sincronizada, com o nó vazio dominando, e compactar o resultado | [ADR-0015](adrs/0015-bonus-de-mestrado.md) |
+| Translação | Vamos deslocar as folhas cheias e reconstruir uma nova octree, como na escala | [ADR-0015](adrs/0015-bonus-de-mestrado.md) |
+| Área superficial | Vamos somar as partes expostas das faces das células cheias, calculadas exatamente | [ADR-0015](adrs/0015-bonus-de-mestrado.md) |
+| Iluminação local | Vamos aplicar o modelo de Phong em cada vértice do modo sólido, com uma luz pontual | [ADR-0015](adrs/0015-bonus-de-mestrado.md) |
 | Profundidade interativa | Usaremos valores de 1 a 8 para novas criações e leituras; modelos existentes mantêm suas configurações | [ADR-0012](adrs/0012-integracao-das-operacoes-a-interface.md) |
 
 ## Restrições operacionais

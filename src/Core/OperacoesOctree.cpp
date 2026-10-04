@@ -186,6 +186,64 @@ namespace
     return resultado;
   }
 
+  TNoOctree IntersectaNos(
+    const TNoOctree& primeiro,
+    const TNoOctree& segundo
+  )
+  {
+    if (!CubosIguais(primeiro.Regiao(), segundo.Regiao())) {
+      throw std::invalid_argument("Os nos devem representar a mesma regiao");
+    }
+
+    if (
+      primeiro.Estado() == EEstadoNoOctree::VAZIO ||
+      segundo.Estado() == EEstadoNoOctree::VAZIO
+    ) {
+      return TNoOctree(primeiro.Regiao(), EEstadoNoOctree::VAZIO);
+    }
+
+    if (primeiro.Estado() == EEstadoNoOctree::CHEIO) {
+      return ClonaNo(segundo);
+    }
+
+    if (segundo.Estado() == EEstadoNoOctree::CHEIO) {
+      return ClonaNo(primeiro);
+    }
+
+    TNoOctree resultado(primeiro.Regiao(), EEstadoNoOctree::PARCIAL);
+
+    for (std::size_t indice = 0; indice < 8; ++indice) {
+      resultado.Filho(indice) = IntersectaNos(
+        primeiro.Filho(indice),
+        segundo.Filho(indice)
+      );
+    }
+
+    CompactaNo(resultado);
+    return resultado;
+  }
+
+  TConfiguracaoOctree ConfiguracaoBooleana(
+    const TOctree& primeira,
+    const TOctree& segunda
+  )
+  {
+    const TCubo& primeiroDominio = primeira.Configuracao().Dominio();
+    const TCubo& segundoDominio = segunda.Configuracao().Dominio();
+
+    if (!CubosIguais(primeiroDominio, segundoDominio)) {
+      throw std::invalid_argument("As octrees devem possuir o mesmo dominio");
+    }
+
+    return TConfiguracaoOctree(
+      primeiroDominio,
+      std::max(
+        primeira.Configuracao().ProfundidadeMaxima(),
+        segunda.Configuracao().ProfundidadeMaxima()
+      )
+    );
+  }
+
   void PreparaSubdivisaoVazia(
     TNoOctree& no
   )
@@ -247,11 +305,28 @@ namespace
     );
   }
 
-  void InsereFolhasEscaladas(
+  TCubo TransladaCubo(
+    const TCubo& cubo,
+    const TCoordenada3D& deslocamento
+  )
+  {
+    return TCubo(
+      {
+        cubo.Centro().x + deslocamento.x,
+        cubo.Centro().y + deslocamento.y,
+        cubo.Centro().z + deslocamento.z
+      },
+      cubo.Lado()
+    );
+  }
+
+  template <typename TTransformacao>
+  void InsereFolhasTransformadas(
     const TNoOctree& origem,
     TNoOctree& destino,
     const TConfiguracaoOctree& configuracao,
-    double fator
+    const TTransformacao& transforma,
+    const char* erroDominio
   )
   {
     if (origem.Estado() == EEstadoNoOctree::VAZIO) {
@@ -259,26 +334,27 @@ namespace
     }
 
     if (origem.Estado() == EEstadoNoOctree::CHEIO) {
-      const TCubo cuboEscalado = EscalaCubo(origem.Regiao(), fator);
+      const TCubo cuboTransformado = transforma(origem.Regiao());
 
-      if (!CuboContido(cuboEscalado, configuracao.Dominio())) {
-        throw std::invalid_argument("A escala ultrapassa o dominio da octree");
+      if (!CuboContido(cuboTransformado, configuracao.Dominio())) {
+        throw std::invalid_argument(erroDominio);
       }
 
       InsereCubo(
         destino,
-        cuboEscalado,
+        cuboTransformado,
         configuracao.ProfundidadeMaxima()
       );
       return;
     }
 
     for (std::size_t indice = 0; indice < 8; ++indice) {
-      InsereFolhasEscaladas(
+      InsereFolhasTransformadas(
         origem.Filho(indice),
         destino,
         configuracao,
-        fator
+        transforma,
+        erroDominio
       );
     }
   }
@@ -291,24 +367,22 @@ TOctree TOperacoesBooleanasOctree::Uniao(
   const TOctree& segunda
 ) const
 {
-  const TCubo& primeiroDominio = primeira.Configuracao().Dominio();
-  const TCubo& segundoDominio = segunda.Configuracao().Dominio();
-
-  if (!CubosIguais(primeiroDominio, segundoDominio)) {
-    throw std::invalid_argument("As octrees devem possuir o mesmo dominio");
-  }
-
-  const TConfiguracaoOctree configuracao(
-    primeiroDominio,
-    std::max(
-      primeira.Configuracao().ProfundidadeMaxima(),
-      segunda.Configuracao().ProfundidadeMaxima()
-    )
-  );
-
   return TOctree(
-    configuracao,
+    ConfiguracaoBooleana(primeira, segunda),
     UneNos(primeira.Raiz(), segunda.Raiz())
+  );
+}
+
+//----------------------------------------------------------------------------------------------
+
+TOctree TOperacoesBooleanasOctree::Intersecao(
+  const TOctree& primeira,
+  const TOctree& segunda
+) const
+{
+  return TOctree(
+    ConfiguracaoBooleana(primeira, segunda),
+    IntersectaNos(primeira.Raiz(), segunda.Raiz())
   );
 }
 
@@ -326,11 +400,37 @@ TOctree TOperacoesGeometricasOctree::Escala(
   const TConfiguracaoOctree& configuracao = octree.Configuracao();
   TNoOctree raiz(configuracao.Dominio(), EEstadoNoOctree::VAZIO);
 
-  InsereFolhasEscaladas(
+  InsereFolhasTransformadas(
     octree.Raiz(),
     raiz,
     configuracao,
-    fator
+    [fator](const TCubo& cubo) { return EscalaCubo(cubo, fator); },
+    "A escala ultrapassa o dominio da octree"
+  );
+
+  return TOctree(configuracao, std::move(raiz));
+}
+
+//----------------------------------------------------------------------------------------------
+
+TOctree TOperacoesGeometricasOctree::Translada(
+  const TOctree& octree,
+  const TCoordenada3D& deslocamento
+) const
+{
+  if (!std::isfinite(deslocamento.x) || !std::isfinite(deslocamento.y) || !std::isfinite(deslocamento.z)) {
+    throw std::invalid_argument("O deslocamento deve ser finito");
+  }
+
+  const TConfiguracaoOctree& configuracao = octree.Configuracao();
+  TNoOctree raiz(configuracao.Dominio(), EEstadoNoOctree::VAZIO);
+
+  InsereFolhasTransformadas(
+    octree.Raiz(),
+    raiz,
+    configuracao,
+    [&deslocamento](const TCubo& cubo) { return TransladaCubo(cubo, deslocamento); },
+    "A translacao ultrapassa o dominio da octree"
   );
 
   return TOctree(configuracao, std::move(raiz));

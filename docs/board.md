@@ -21,6 +21,7 @@ Um card está concluído quando atende ao critério indicado e passa pela compil
 | `T11` | Renderizar em aramado | Marcos |
 | `T12` | Integrar operações à interface | Marcos |
 | `T17` | Visualizar a octree (bônus antecipado) | Tiago |
+| `T18` | Adicionar cilindro, interseção, translação, área superficial e iluminação local (bônus de mestrado antecipado) | Tiago |
 | `T22` | Renderizar em sólido, opcional (fora do plano) | Tiago |
 
 ## Em andamento
@@ -44,7 +45,6 @@ Nenhum card.
 
 | ID | Nível | Card |
 | --- | --- | --- |
-| `T18` | Mestrado | Adicionar cilindro, interseção, translação, área superficial e iluminação local |
 | `T19` | Doutorado | Adicionar cone, diferença e rotação |
 | `T20` | Doutorado | Avaliar modelagem 4D com tempo |
 | `T21` | Doutorado | Avaliar iluminação global |
