@@ -25,6 +25,7 @@ Este documento consolida as decisões que tomamos a partir do enunciado, das aul
 | Aramado | Vamos percorrer a octree e desenhar as 12 arestas de cada folha cheia com OpenGL | [ADR-0011](adrs/0011-renderizacao-aramada-das-folhas.md) |
 | Interface | Vamos manter uma lista de modelos; união e escala acrescentam resultados sem substituir as entradas | [ADR-0012](adrs/0012-integracao-das-operacoes-a-interface.md) |
 | Estrutura da octree | Vamos inspecionar todos os nós em uma janela flutuante aberta por um botão, com árvore, contagens por nível e aramado colorido por estado | [ADR-0013](adrs/0013-visualizacao-da-estrutura-da-octree.md) |
+| Visualização sólida | Vamos oferecer faces preenchidas das folhas cheias por um checkbox, mantendo o aramado como padrão | [ADR-0014](adrs/0014-visualizacao-solida-opcional.md) |
 | Profundidade interativa | Usaremos valores de 1 a 8 para novas criações e leituras; modelos existentes mantêm suas configurações | [ADR-0012](adrs/0012-integracao-das-operacoes-a-interface.md) |
 
 ## Restrições operacionais
@@ -37,4 +38,4 @@ Este documento consolida as decisões que tomamos a partir do enunciado, das aul
 
 ## Estado desta consolidação
 
-Não há decisões pendentes neste momento.
+Há uma decisão pendente sobre a classificação das células terminais, registrada em [decisoes-pendentes.md](decisoes-pendentes.md).

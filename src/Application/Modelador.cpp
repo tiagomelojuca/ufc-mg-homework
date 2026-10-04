@@ -32,6 +32,7 @@ TModeloOctree::TModeloOctree(
   nome(nome),
   octree(std::make_shared<const TOctree>(std::move(octree))),
   arestas(TGeradorAramadoOctree().Gera(*this->octree)),
+  faces(TGeradorSuperficieOctree().Gera(*this->octree)),
   volume(TAnaliseOctree().CalculaVolume(*this->octree))
 {
 }
@@ -56,6 +57,11 @@ const TOctree& TModeloOctree::Octree() const
 const std::vector<TAresta3D>& TModeloOctree::Arestas() const
 {
   return arestas;
+}
+
+const std::vector<TFace3D>& TModeloOctree::Faces() const
+{
+  return faces;
 }
 
 double TModeloOctree::Volume() const

@@ -18,6 +18,7 @@ O software é um modelador 3D baseado em subdivisão espacial por octree. A impl
 - visualização aramada de bloco e esfera a partir das folhas cheias;
 - interface para criação, união, escala, arquivos e remoção de modelos;
 - volume, profundidade e quantidade de células cheias do modelo selecionado;
+- visualização sólida opcional, com o aramado como padrão;
 - inspeção da estrutura completa da octree em uma janela flutuante (bônus);
 - testes unitários do núcleo geométrico com GoogleTest.
 
@@ -79,6 +80,8 @@ Em **Operar**, selecione duas entradas para união ou aplique escala ao modelo s
 
 Em **Arquivo**, informe o caminho para abrir ou salvar uma octree no formato DF. Caminhos relativos usam a pasta de execução. A substituição de um arquivo existente pede confirmação.
 
+Marque **Sólido**, acima da visualização, para preencher as faces externas do modelo; desmarcado, a visualização volta ao aramado.
+
 O botão **Estrutura da octree**, acima da visualização, abre uma janela flutuante com todos os nós do modelo selecionado: árvore navegável, quantidade de nós por nível e aramado colorido por estado. Clique em um nó da árvore para enquadrá-lo.
 
 ## Executar os testes
@@ -87,7 +90,7 @@ O botão **Estrutura da octree**, acima da visualização, abre uma janela flutu
 ctest --test-dir build --output-on-failure
 ```
 
-Os testes do núcleo e da aplicação não abrem janelas nem criam um contexto OpenGL. A suíte atual contém 92 testes.
+Os testes do núcleo e da aplicação não abrem janelas nem criam um contexto OpenGL. A suíte atual contém 98 testes.
 
 Para compilar sem os testes:
 

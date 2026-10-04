@@ -21,6 +21,7 @@ Um card está concluído quando atende ao critério indicado e passa pela compil
 | `T11` | Renderizar em aramado | Marcos |
 | `T12` | Integrar operações à interface | Marcos |
 | `T17` | Visualizar a octree (bônus antecipado) | Tiago |
+| `T22` | Renderizar em sólido, opcional (fora do plano) | Tiago |
 
 ## Em andamento
 

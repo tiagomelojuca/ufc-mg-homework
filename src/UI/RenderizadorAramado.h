@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "Core/AramadoOctree.h"
+#include "Core/SuperficieOctree.h"
 
 //----------------------------------------------------------------------------------------------
 
@@ -43,6 +44,17 @@ class TRenderizadorAramado
       const TCubo& enquadramento,
       const TRetanguloTela& area,
       const TRetanguloTela& recorte
+    ) const;
+
+    // Preenche as faces com um tom por orientação e desenha as arestas por cima.
+    void DesenhaSolido(
+      const std::vector<TFace3D>& faces,
+      const std::vector<TAresta3D>& arestas,
+      const TCubo& dominio,
+      int x,
+      int y,
+      int largura,
+      int altura
     ) const;
 };
 

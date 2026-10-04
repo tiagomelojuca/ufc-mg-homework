@@ -9,6 +9,7 @@
 #include "Core/AramadoOctree.h"
 #include "Core/Bloco.h"
 #include "Core/Esfera.h"
+#include "Core/SuperficieOctree.h"
 
 //----------------------------------------------------------------------------------------------
 
@@ -25,6 +26,7 @@ class TModeloOctree
     const std::string& Nome() const;
     const TOctree& Octree() const;
     const std::vector<TAresta3D>& Arestas() const;
+    const std::vector<TFace3D>& Faces() const;
     double Volume() const;
 
   private:
@@ -32,6 +34,7 @@ class TModeloOctree
     std::string nome;
     std::shared_ptr<const TOctree> octree;
     std::vector<TAresta3D> arestas;
+    std::vector<TFace3D> faces;
     double volume;
 };
 

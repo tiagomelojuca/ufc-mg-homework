@@ -374,10 +374,18 @@ void TPainelModelador::DesenhaVisualizacao()
   ImGui::Begin("Visualizacao", nullptr, FLAGS_PAINEL | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar);
   const TModeloOctree* modelo = modelador.Selecionado();
   Titulo(modelo == nullptr ? "Visualização" : modelo->Nome().c_str());
+  const char* rotuloSolido = "Sólido";
   const char* rotuloEstrutura = "Estrutura da octree";
-  const float larguraEstrutura = ImGui::CalcTextSize(rotuloEstrutura).x + 2.0f * ImGui::GetStyle().FramePadding.x;
+  const ImGuiStyle& estilo = ImGui::GetStyle();
+  const float larguraSolido = ImGui::GetFrameHeight() + estilo.ItemInnerSpacing.x + ImGui::CalcTextSize(rotuloSolido).x;
+  const float larguraEstrutura = ImGui::CalcTextSize(rotuloEstrutura).x + 2.0f * estilo.FramePadding.x;
   ImGui::SameLine();
-  ImGui::SetCursorPosX(ImGui::GetCursorPosX() + std::max(0.0f, ImGui::GetContentRegionAvail().x - larguraEstrutura));
+  ImGui::SetCursorPosX(ImGui::GetCursorPosX() + std::max(0.0f, ImGui::GetContentRegionAvail().x - larguraSolido - estilo.ItemSpacing.x * 2.0f - larguraEstrutura));
+  ImGui::Checkbox(rotuloSolido, &solido);
+  if (ImGui::IsItemHovered()) {
+    ImGui::SetTooltip("Preenche as faces externas das folhas cheias. Desmarcado, mostra o aramado.");
+  }
+  ImGui::SameLine(0.0f, estilo.ItemSpacing.x * 2.0f);
   ImGui::BeginDisabled(modelo == nullptr);
   if (ImGui::Button(rotuloEstrutura)) {
     janelaEstrutura.Abre();
@@ -386,7 +394,7 @@ void TPainelModelador::DesenhaVisualizacao()
     ImGui::SetTooltip("Inspecionar todos os nós da octree: cheios, vazios e parciais.");
   }
   ImGui::EndDisabled();
-  Rotulo("ARAMADO · FOLHAS CHEIAS DA OCTREE");
+  Rotulo(solido ? "SUPERFÍCIE · FOLHAS CHEIAS DA OCTREE" : "ARAMADO · FOLHAS CHEIAS DA OCTREE");
   const float larguraCartao = (ImGui::GetContentRegionAvail().x - 20.0f) / 3.0f;
   const std::string volume = modelo == nullptr ? "--" : std::to_string(modelo->Volume()) + " u³";
   const std::string profundidadeModelo = modelo == nullptr ? "--" : std::to_string(modelo->Octree().Configuracao().ProfundidadeMaxima());
@@ -424,13 +432,16 @@ void TPainelModelador::DesenhaModelo(
   const float escalaX = larguraFramebuffer / tela.x;
   const float escalaY = alturaFramebuffer / tela.y;
   // ImGui mede a cena a partir do topo; OpenGL mede o viewport a partir da base.
-  TRenderizadorAramado().Desenha(
-    modelo->Arestas(), modelo->Octree().Configuracao().Dominio(),
-    static_cast<int>(posicaoCena.x * escalaX),
-    static_cast<int>((tela.y - posicaoCena.y - tamanhoCena.y) * escalaY),
-    static_cast<int>(tamanhoCena.x * escalaX),
-    static_cast<int>(tamanhoCena.y * escalaY)
-  );
+  const int x = static_cast<int>(posicaoCena.x * escalaX);
+  const int y = static_cast<int>((tela.y - posicaoCena.y - tamanhoCena.y) * escalaY);
+  const int largura = static_cast<int>(tamanhoCena.x * escalaX);
+  const int altura = static_cast<int>(tamanhoCena.y * escalaY);
+  const TCubo& dominio = modelo->Octree().Configuracao().Dominio();
+  if (solido) {
+    TRenderizadorAramado().DesenhaSolido(modelo->Faces(), modelo->Arestas(), dominio, x, y, largura, altura);
+  } else {
+    TRenderizadorAramado().Desenha(modelo->Arestas(), dominio, x, y, largura, altura);
+  }
 }
 
 void TPainelModelador::DesenhaMensagem()

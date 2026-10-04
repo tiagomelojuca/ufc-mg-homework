@@ -15,5 +15,6 @@
 | [0011](0011-renderizacao-aramada-das-folhas.md) | Renderização aramada das folhas | Aceito |
 | [0012](0012-integracao-das-operacoes-a-interface.md) | Integração das operações à interface | Aceito |
 | [0013](0013-visualizacao-da-estrutura-da-octree.md) | Visualização da estrutura da octree | Aceito |
+| [0014](0014-visualizacao-solida-opcional.md) | Visualização sólida opcional | Aceito |
 
 Estados possíveis: Proposto, Aceito, Substituído e Rejeitado.
