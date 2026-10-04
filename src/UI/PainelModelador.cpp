@@ -12,7 +12,7 @@ namespace
   constexpr float LARGURA_CONTROLES = 344.0f;
   constexpr ImGuiWindowFlags FLAGS_PAINEL =
     ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
-    ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings;
+    ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoBringToFrontOnFocus;
 
   void Titulo(
     const char* texto
@@ -117,6 +117,7 @@ void TPainelModelador::Desenha()
   DesenhaControles();
   DesenhaVisualizacao();
   DesenhaMensagem();
+  janelaEstrutura.Desenha(modelador.Selecionado());
   DesenhaConfirmacao();
 }
 
@@ -373,6 +374,18 @@ void TPainelModelador::DesenhaVisualizacao()
   ImGui::Begin("Visualizacao", nullptr, FLAGS_PAINEL | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar);
   const TModeloOctree* modelo = modelador.Selecionado();
   Titulo(modelo == nullptr ? "Visualização" : modelo->Nome().c_str());
+  const char* rotuloEstrutura = "Estrutura da octree";
+  const float larguraEstrutura = ImGui::CalcTextSize(rotuloEstrutura).x + 2.0f * ImGui::GetStyle().FramePadding.x;
+  ImGui::SameLine();
+  ImGui::SetCursorPosX(ImGui::GetCursorPosX() + std::max(0.0f, ImGui::GetContentRegionAvail().x - larguraEstrutura));
+  ImGui::BeginDisabled(modelo == nullptr);
+  if (ImGui::Button(rotuloEstrutura)) {
+    janelaEstrutura.Abre();
+  }
+  if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+    ImGui::SetTooltip("Inspecionar todos os nós da octree: cheios, vazios e parciais.");
+  }
+  ImGui::EndDisabled();
   Rotulo("ARAMADO · FOLHAS CHEIAS DA OCTREE");
   const float larguraCartao = (ImGui::GetContentRegionAvail().x - 20.0f) / 3.0f;
   const std::string volume = modelo == nullptr ? "--" : std::to_string(modelo->Volume()) + " u³";

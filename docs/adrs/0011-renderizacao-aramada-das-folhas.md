@@ -18,7 +18,7 @@ O aramado é gerado quando o modelo é criado ou alterado. A janela reutiliza os
 ## Consequências
 
 - O percurso segue os estados e as regiões guardadas na octree, inclusive após união e escala.
-- Nós parciais e vazios não recebem caixas de visualização. A inspeção da estrutura completa continua no bônus T17.
+- Nós parciais e vazios não recebem caixas de visualização. A inspeção da estrutura completa continua no bônus T17 ([ADR-0013](0013-visualizacao-da-estrutura-da-octree.md)).
 - Arestas internas e compartilhadas entre folhas são mantidas. Essa versão não extrai a superfície nem remove linhas ocultas.
 - A esfera mostra a aproximação por células definida pela profundidade.
 - Não precisamos acrescentar dependências gráficas.

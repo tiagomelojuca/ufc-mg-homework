@@ -1,7 +1,27 @@
 #ifndef RENDERIZADOR_ARAMADO_H_
 #define RENDERIZADOR_ARAMADO_H_
 
+#include <vector>
+
 #include "Core/AramadoOctree.h"
+
+//----------------------------------------------------------------------------------------------
+
+struct TLoteAramado
+{
+  const std::vector<TAresta3D>* arestas;
+  float cor[3];
+};
+
+//----------------------------------------------------------------------------------------------
+
+struct TRetanguloTela
+{
+  int x;
+  int y;
+  int largura;
+  int altura;
+};
 
 //----------------------------------------------------------------------------------------------
 
@@ -15,6 +35,14 @@ class TRenderizadorAramado
       int y,
       int largura,
       int altura
+    ) const;
+
+    // Desenha os lotes na ordem recebida; o recorte limita viewport e limpeza de profundidade.
+    void Desenha(
+      const std::vector<TLoteAramado>& lotes,
+      const TCubo& enquadramento,
+      const TRetanguloTela& area,
+      const TRetanguloTela& recorte
     ) const;
 };
 

@@ -23,6 +23,32 @@ namespace
 
     return volume;
   }
+
+  void ContaNo(
+    const TNoOctree& no,
+    std::size_t nivel,
+    std::vector<TContagemNivelOctree>& contagens
+  )
+  {
+    if (contagens.size() <= nivel) {
+      contagens.resize(nivel + 1);
+    }
+
+    if (no.Estado() == EEstadoNoOctree::VAZIO) {
+      ++contagens[nivel].vazios;
+      return;
+    }
+
+    if (no.Estado() == EEstadoNoOctree::CHEIO) {
+      ++contagens[nivel].cheios;
+      return;
+    }
+
+    ++contagens[nivel].parciais;
+    for (std::size_t indice = 0; indice < 8; ++indice) {
+      ContaNo(no.Filho(indice), nivel + 1, contagens);
+    }
+  }
 }
 
 //----------------------------------------------------------------------------------------------
@@ -32,6 +58,19 @@ double TAnaliseOctree::CalculaVolume(
 ) const
 {
   return CalculaVolumeNo(octree.Raiz());
+}
+
+//
+
+//----------------------------------------------------------------------------------------------
+
+std::vector<TContagemNivelOctree> TAnaliseOctree::ContaNosPorNivel(
+  const TNoOctree& raiz
+) const
+{
+  std::vector<TContagemNivelOctree> contagens;
+  ContaNo(raiz, 0, contagens);
+  return contagens;
 }
 
 //----------------------------------------------------------------------------------------------

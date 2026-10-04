@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <set>
+#include <stdexcept>
 #include <tuple>
 #include <utility>
 
@@ -189,6 +190,91 @@ TEST(AramadoOctreeTest, deve_desenhar_as_celulas_transformadas_pela_escala)
 
   ASSERT_EQ(arestas.size(), 12u);
   VerificaArestasCubo(arestas, 0, TCubo({ -0.25, -0.25, -0.25 }, 0.5));
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(AramadoOctreeTest, deve_gerar_somente_a_raiz_na_estrutura_com_zero_niveis)
+{
+  const TConfiguracaoOctree configuracao;
+  const TOctree octree(configuracao, CriaRaizVaziaSubdividida(configuracao));
+  const auto estrutura = TGeradorAramadoOctree().GeraEstrutura(octree.Raiz(), 0);
+
+  ASSERT_EQ(estrutura.parciais.size(), 12u);
+  EXPECT_TRUE(estrutura.cheias.empty());
+  EXPECT_TRUE(estrutura.vazias.empty());
+  VerificaArestasCubo(estrutura.parciais, 0, octree.Raiz().Regiao());
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(AramadoOctreeTest, deve_separar_os_nos_da_estrutura_por_estado)
+{
+  const TConfiguracaoOctree configuracao;
+  TNoOctree raiz = CriaRaizVaziaSubdividida(configuracao);
+  raiz.Filho(1).DefineEstado(EEstadoNoOctree::CHEIO);
+  raiz.Filho(6).DefineEstado(EEstadoNoOctree::PARCIAL);
+  for (std::size_t indice = 0; indice < 8; ++indice) {
+    raiz.Filho(6).Filho(indice).DefineEstado(
+      indice == 3 ? EEstadoNoOctree::CHEIO : EEstadoNoOctree::VAZIO
+    );
+  }
+  const TOctree octree(configuracao, std::move(raiz));
+  const auto estrutura = TGeradorAramadoOctree().GeraEstrutura(octree.Raiz(), 2);
+
+  ASSERT_EQ(estrutura.parciais.size(), 24u);
+  ASSERT_EQ(estrutura.cheias.size(), 24u);
+  ASSERT_EQ(estrutura.vazias.size(), 13u * 12u);
+  VerificaArestasCubo(estrutura.parciais, 0, octree.Raiz().Regiao());
+  VerificaArestasCubo(estrutura.parciais, 12, octree.Raiz().Filho(6).Regiao());
+  VerificaArestasCubo(estrutura.cheias, 0, octree.Raiz().Filho(1).Regiao());
+  VerificaArestasCubo(estrutura.cheias, 12, octree.Raiz().Filho(6).Filho(3).Regiao());
+  VerificaArestasCubo(estrutura.vazias, 0, octree.Raiz().Filho(0).Regiao());
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(AramadoOctreeTest, deve_limitar_a_estrutura_aos_niveis_pedidos)
+{
+  const TConfiguracaoOctree configuracao;
+  TNoOctree raiz = CriaRaizVaziaSubdividida(configuracao);
+  raiz.Filho(6).DefineEstado(EEstadoNoOctree::PARCIAL);
+  const TOctree octree(configuracao, std::move(raiz));
+  const auto estrutura = TGeradorAramadoOctree().GeraEstrutura(octree.Raiz(), 1);
+
+  ASSERT_EQ(estrutura.parciais.size(), 24u);
+  EXPECT_TRUE(estrutura.cheias.empty());
+  EXPECT_EQ(estrutura.vazias.size(), 7u * 12u);
+  VerificaArestasCubo(estrutura.parciais, 12, octree.Raiz().Filho(6).Regiao());
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(AramadoOctreeTest, deve_gerar_a_estrutura_a_partir_de_um_no_interno)
+{
+  const TConfiguracaoOctree configuracao;
+  TNoOctree raiz = CriaRaizVaziaSubdividida(configuracao);
+  raiz.Filho(2).DefineEstado(EEstadoNoOctree::PARCIAL);
+  const TOctree octree(configuracao, std::move(raiz));
+  const TNoOctree& no = octree.Raiz().Filho(2);
+  const auto estrutura = TGeradorAramadoOctree().GeraEstrutura(no, 5);
+
+  ASSERT_EQ(estrutura.parciais.size(), 12u);
+  ASSERT_EQ(estrutura.cheias.size(), 96u);
+  EXPECT_TRUE(estrutura.vazias.empty());
+  VerificaArestasCubo(estrutura.parciais, 0, no.Regiao());
+  for (std::size_t indice = 0; indice < 8; ++indice) {
+    VerificaArestasCubo(estrutura.cheias, indice * 12, no.Filho(indice).Regiao());
+  }
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(AramadoOctreeTest, deve_rejeitar_quantidade_negativa_de_niveis_na_estrutura)
+{
+  const TOctree octree;
+
+  EXPECT_THROW(TGeradorAramadoOctree().GeraEstrutura(octree.Raiz(), -1), std::invalid_argument);
 }
 
 //----------------------------------------------------------------------------------------------

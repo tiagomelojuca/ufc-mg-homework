@@ -13,25 +13,41 @@ void TRenderizadorAramado::Desenha(
   int altura
 ) const
 {
-  if (largura <= 0 || altura <= 0) {
+  const TRetanguloTela area = { x, y, largura, altura };
+  Desenha({ { &arestas, { 0.35f, 0.8f, 1.0f } } }, dominio, area, area);
+}
+
+//----------------------------------------------------------------------------------------------
+
+void TRenderizadorAramado::Desenha(
+  const std::vector<TLoteAramado>& lotes,
+  const TCubo& enquadramento,
+  const TRetanguloTela& area,
+  const TRetanguloTela& recorte
+) const
+{
+  if (area.largura <= 0 || area.altura <= 0 || recorte.largura <= 0 || recorte.altura <= 0) {
     return;
   }
 
   GLint modoMatriz;
   glGetIntegerv(GL_MATRIX_MODE, &modoMatriz);
   glPushAttrib(GL_ALL_ATTRIB_BITS);
-  glViewport(x, y, largura, altura);
-  glDisable(GL_SCISSOR_TEST);
+  glViewport(area.x, area.y, area.largura, area.altura);
+  glEnable(GL_SCISSOR_TEST);
+  glScissor(recorte.x, recorte.y, recorte.largura, recorte.altura);
   glDisable(GL_TEXTURE_2D);
   glDisable(GL_LIGHTING);
   glDisable(GL_BLEND);
+  glDisable(GL_CULL_FACE);
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LEQUAL);
   glDepthMask(GL_TRUE);
+  glClear(GL_DEPTH_BUFFER_BIT);
   glLineWidth(1.0f);
 
-  const double aspecto = static_cast<double>(largura) / altura;
-  const double alcance = dominio.Lado();
+  const double aspecto = static_cast<double>(area.largura) / area.altura;
+  const double alcance = enquadramento.Lado();
   const double alcanceX = aspecto >= 1.0 ? alcance * aspecto : alcance;
   const double alcanceY = aspecto >= 1.0 ? alcance : alcance / aspecto;
 
@@ -45,13 +61,15 @@ void TRenderizadorAramado::Desenha(
   glLoadIdentity();
   glRotated(25.0, 1.0, 0.0, 0.0);
   glRotated(-35.0, 0.0, 1.0, 0.0);
-  glTranslated(-dominio.Centro().x, -dominio.Centro().y, -dominio.Centro().z);
+  glTranslated(-enquadramento.Centro().x, -enquadramento.Centro().y, -enquadramento.Centro().z);
 
-  glColor3f(0.35f, 0.8f, 1.0f);
   glBegin(GL_LINES);
-  for (const TAresta3D& aresta : arestas) {
-    glVertex3d(aresta.inicio.x, aresta.inicio.y, aresta.inicio.z);
-    glVertex3d(aresta.fim.x, aresta.fim.y, aresta.fim.z);
+  for (const TLoteAramado& lote : lotes) {
+    glColor3fv(lote.cor);
+    for (const TAresta3D& aresta : *lote.arestas) {
+      glVertex3d(aresta.inicio.x, aresta.inicio.y, aresta.inicio.z);
+      glVertex3d(aresta.fim.x, aresta.fim.y, aresta.fim.z);
+    }
   }
   glEnd();
 

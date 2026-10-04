@@ -15,11 +15,25 @@ struct TAresta3D
 
 //----------------------------------------------------------------------------------------------
 
+struct TEstruturaAramadaOctree
+{
+  std::vector<TAresta3D> parciais;
+  std::vector<TAresta3D> cheias;
+  std::vector<TAresta3D> vazias;
+};
+
+//----------------------------------------------------------------------------------------------
+
 class TGeradorAramadoOctree
 {
   public:
     std::vector<TAresta3D> Gera(
       const TOctree& octree
+    ) const;
+
+    TEstruturaAramadaOctree GeraEstrutura(
+      const TNoOctree& raiz,
+      int niveis
     ) const;
 };
 

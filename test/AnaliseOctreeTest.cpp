@@ -162,3 +162,51 @@ TEST(AnaliseOctreeTest, deve_calcular_o_volume_apos_uma_escala_alinhada)
 }
 
 //----------------------------------------------------------------------------------------------
+
+TEST(AnaliseOctreeTest, deve_contar_uma_folha_no_nivel_zero)
+{
+  const TOctree octree = CriaOctreeFolha(EEstadoNoOctree::VAZIO);
+  const auto contagens = TAnaliseOctree().ContaNosPorNivel(octree.Raiz());
+
+  ASSERT_EQ(contagens.size(), 1u);
+  EXPECT_EQ(contagens[0].vazios, 1u);
+  EXPECT_EQ(contagens[0].cheios, 0u);
+  EXPECT_EQ(contagens[0].parciais, 0u);
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(AnaliseOctreeTest, deve_contar_os_nos_de_cada_nivel_por_estado)
+{
+  const TConfiguracaoOctree configuracao;
+  TNoOctree raiz(configuracao.Dominio(), EEstadoNoOctree::PARCIAL);
+  for (std::size_t indice = 0; indice < 8; ++indice) {
+    raiz.Filho(indice).DefineEstado(indice < 3 ? EEstadoNoOctree::VAZIO : EEstadoNoOctree::CHEIO);
+  }
+  raiz.Filho(7).DefineEstado(EEstadoNoOctree::PARCIAL);
+  raiz.Filho(7).Filho(0).DefineEstado(EEstadoNoOctree::VAZIO);
+  const TOctree octree(configuracao, std::move(raiz));
+  const auto contagens = TAnaliseOctree().ContaNosPorNivel(octree.Raiz());
+
+  ASSERT_EQ(contagens.size(), 3u);
+  EXPECT_EQ(contagens[0].parciais, 1u);
+  EXPECT_EQ(contagens[1].vazios, 3u);
+  EXPECT_EQ(contagens[1].cheios, 4u);
+  EXPECT_EQ(contagens[1].parciais, 1u);
+  EXPECT_EQ(contagens[2].vazios, 1u);
+  EXPECT_EQ(contagens[2].cheios, 7u);
+  EXPECT_EQ(contagens[2].parciais, 0u);
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(AnaliseOctreeTest, deve_contar_os_niveis_a_partir_de_um_no_interno)
+{
+  const TOctree octree = CriaOctreeComOctanteCheio(TConfiguracaoOctree(), 4);
+  const auto contagens = TAnaliseOctree().ContaNosPorNivel(octree.Raiz().Filho(4));
+
+  ASSERT_EQ(contagens.size(), 1u);
+  EXPECT_EQ(contagens[0].cheios, 1u);
+}
+
+//----------------------------------------------------------------------------------------------

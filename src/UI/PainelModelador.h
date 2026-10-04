@@ -5,6 +5,7 @@
 #include <string>
 
 #include "Application/Modelador.h"
+#include "JanelaEstruturaOctree.h"
 #include "UiFramework.h"
 
 //----------------------------------------------------------------------------------------------
@@ -40,6 +41,7 @@ class TPainelModelador
     );
 
     TModelador modelador;
+    TJanelaEstruturaOctree janelaEstrutura;
     int profundidade = 5;
     int primitiva = 0;
     std::string nome;

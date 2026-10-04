@@ -20,6 +20,7 @@ Um card está concluído quando atende ao critério indicado e passa pela compil
 | `T10` | Calcular volume | Marcos |
 | `T11` | Renderizar em aramado | Marcos |
 | `T12` | Integrar operações à interface | Marcos |
+| `T17` | Visualizar a octree (bônus antecipado) | Tiago |
 
 ## Em andamento
 
@@ -42,7 +43,6 @@ Nenhum card.
 
 | ID | Nível | Card |
 | --- | --- | --- |
-| `T17` | Extra | Visualizar a octree |
 | `T18` | Mestrado | Adicionar cilindro, interseção, translação, área superficial e iluminação local |
 | `T19` | Doutorado | Adicionar cone, diferença e rotação |
 | `T20` | Doutorado | Avaliar modelagem 4D com tempo |

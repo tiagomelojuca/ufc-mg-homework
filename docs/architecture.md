@@ -11,6 +11,7 @@ main.cpp
         ├── GLFW / contexto OpenGL
         ├── TPainelModelador / controles Dear ImGui
         │   └── TModelador / lista de modelos e casos de uso
+        ├── TJanelaEstruturaOctree / inspeção da octree
         ├── TRenderizadorAramado / desenho OpenGL
         └── loop de eventos e renderização
 ```
@@ -22,6 +23,8 @@ O núcleo geométrico agora possui `TOctree`, `TNoOctree`, `TCubo`, a configura�
 As operações do núcleo já incluem união, escala e cálculo de volume. A união percorre duas árvores de forma sincronizada. A escala transforma as regiões das folhas cheias e reconstrói a ocupação no mesmo domínio. O volume é calculado diretamente por um percurso recursivo da árvore.
 
 `TGeradorAramadoOctree` percorre a árvore e produz as 12 arestas de cada folha cheia. O núcleo gera segmentos independentes de OpenGL. `TRenderizadorAramado`, em `src/UI`, desenha esses segmentos com `GL_LINES` em uma vista ortográfica fixa.
+
+`TGeradorAramadoOctree::GeraEstrutura` também produz as caixas de todos os nós até um nível escolhido, separadas por estado, e `TAnaliseOctree::ContaNosPorNivel` conta os nós de cada nível. `TJanelaEstruturaOctree` usa essas funções em uma janela flutuante aberta pelo botão “Estrutura da octree”. A cena dessa janela é desenhada por um callback da ImGui, para respeitar a ordem de composição das janelas.
 
 `TModelador`, em `src/Application`, mantém uma lista de modelos e coordena criação, profundidade, união, escala, arquivo e remoção. Cada `TModeloOctree` guarda nome, identificador, uma octree imutável, suas arestas e seu volume. Os resultados são novos modelos, selecionados automaticamente. `TPainelModelador` apresenta os controles, as informações e os erros; a estratégia da janela chama o painel e o desenho do modelo selecionado a cada quadro.
 
@@ -81,7 +84,7 @@ Interface Dear ImGui ─────────┘
 
 - Converter o estado do modelo em comandos gráficos.
 - Oferecer visualização aramada das primitivas.
-- Oferecer visualização da octree como bônus.
+- Oferecer visualização da octree como bônus, em uma janela flutuante que não ocupa a interface principal.
 - Não alterar o modelo geométrico.
 - Manter o percurso geométrico separado dos comandos OpenGL.
 - Usar as regiões das folhas cheias, preservando as arestas internas e compartilhadas nesta versão.

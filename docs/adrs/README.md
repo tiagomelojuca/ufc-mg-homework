@@ -14,5 +14,6 @@
 | [0010](0010-uniao-e-escala-de-octrees.md) | União e escala de octrees | Aceito |
 | [0011](0011-renderizacao-aramada-das-folhas.md) | Renderização aramada das folhas | Aceito |
 | [0012](0012-integracao-das-operacoes-a-interface.md) | Integração das operações à interface | Aceito |
+| [0013](0013-visualizacao-da-estrutura-da-octree.md) | Visualização da estrutura da octree | Aceito |
 
 Estados possíveis: Proposto, Aceito, Substituído e Rejeitado.

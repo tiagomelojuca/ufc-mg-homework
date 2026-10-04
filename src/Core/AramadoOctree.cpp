@@ -1,6 +1,7 @@
 #include "AramadoOctree.h"
 
 #include <array>
+#include <stdexcept>
 
 namespace
 {
@@ -51,6 +52,32 @@ namespace
       GeraAramadoNo(no.Filho(indice), arestas);
     }
   }
+
+  void GeraEstruturaNo(
+    const TNoOctree& no,
+    int niveisRestantes,
+    TEstruturaAramadaOctree& estrutura
+  )
+  {
+    if (no.Estado() == EEstadoNoOctree::VAZIO) {
+      AdicionaArestasCubo(no.Regiao(), estrutura.vazias);
+      return;
+    }
+
+    if (no.Estado() == EEstadoNoOctree::CHEIO) {
+      AdicionaArestasCubo(no.Regiao(), estrutura.cheias);
+      return;
+    }
+
+    AdicionaArestasCubo(no.Regiao(), estrutura.parciais);
+    if (niveisRestantes == 0) {
+      return;
+    }
+
+    for (std::size_t indice = 0; indice < 8; ++indice) {
+      GeraEstruturaNo(no.Filho(indice), niveisRestantes - 1, estrutura);
+    }
+  }
 }
 
 //----------------------------------------------------------------------------------------------
@@ -62,6 +89,24 @@ std::vector<TAresta3D> TGeradorAramadoOctree::Gera(
   std::vector<TAresta3D> arestas;
   GeraAramadoNo(octree.Raiz(), arestas);
   return arestas;
+}
+
+//
+
+//----------------------------------------------------------------------------------------------
+
+TEstruturaAramadaOctree TGeradorAramadoOctree::GeraEstrutura(
+  const TNoOctree& raiz,
+  int niveis
+) const
+{
+  if (niveis < 0) {
+    throw std::invalid_argument("A quantidade de níveis não pode ser negativa");
+  }
+
+  TEstruturaAramadaOctree estrutura;
+  GeraEstruturaNo(raiz, niveis, estrutura);
+  return estrutura;
 }
 
 //----------------------------------------------------------------------------------------------
