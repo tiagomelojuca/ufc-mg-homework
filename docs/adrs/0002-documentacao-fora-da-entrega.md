@@ -9,12 +9,13 @@ A pasta `docs` contém board, arquitetura e ADRs. Esse material organiza a equip
 
 ## Decisão
 
-A pasta `docs` não faz parte da entrega nem do repositório publicado.
+A pasta `docs` fica no repositório, mas não faz parte da entrega ao professor.
 
 O código não menciona documentação, board, cards ou ADRs. Comentários descrevem apenas o próprio código, de forma clara e direta.
 
 ## Consequências
 
+- A equipe compartilha a documentação pelo repositório.
 - A entrega contém somente executável, bibliotecas, código-fonte e apresentação.
 - O código é compreensível sem consulta à documentação interna.
 - Justificativas relevantes para a avaliação são apresentadas na apresentação.
