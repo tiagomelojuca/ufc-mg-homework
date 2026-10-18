@@ -2,11 +2,11 @@
 
 ## Objetivo
 
-Construir um modelador de sólidos por CSG em C++ e Linux. O modelo é uma árvore: as folhas são primitivas e os nós internos são operações booleanas ou geométricas. As operações e análises atuam sobre a árvore, não sobre as primitivas.
+Construir um modelador de sólidos por CSG em C++ e Linux, com modelagem local. As folhas da árvore são primitivas; os nós internos são operações booleanas ou movimentos rígidos. As operações e análises atuam sobre a árvore, não sobre as primitivas.
 
 ## Estado atual
 
-A infraestrutura está pronta: CMake, janela GLFW/OpenGL com Dear ImGui e GoogleTest. As camadas `Core`, `Persistence` e `Application` existem no CMake e ainda não têm fontes. Os detalhes dos algoritmos CSG serão confirmados nas notas da unidade 3 antes da implementação.
+A infraestrutura está pronta: CMake, janela GLFW/OpenGL com Dear ImGui e GoogleTest. O núcleo contém a árvore CSG: `TNoCSG` representa os três tipos de nó, e `TArvoreCSG` aponta para a raiz. Os nós são imutáveis e compartilháveis, de modo que uma operação nunca altera suas entradas. `TPrimitiva` define o contrato das primitivas; bloco e esfera ainda não foram implementados. As camadas `Persistence` e `Application` ainda não têm fontes.
 
 ## Camadas
 
@@ -22,14 +22,14 @@ Aplicação / casos de uso
         │
         ▼
 Núcleo geométrico
-├── árvore CSG (folhas e nós internos)
-├── primitivas e seus parâmetros
-├── transformações
+├── árvore CSG (primitiva, operação booleana, movimento rígido)
+├── primitivas canônicas e seus parâmetros
 ├── classificação SMC (IN, ON, OUT)
-└── análise
+├── ray-casting
+└── volume por conversão em octree
         │
         ├──────────────► Persistência
-        ├──────────────► Renderização (ray-casting)
+        ├──────────────► Renderização
         └──────────────► Testes unitários
 ```
 
@@ -38,9 +38,10 @@ Núcleo geométrico
 ### Núcleo geométrico
 
 - Representar a árvore CSG e seus invariantes.
-- Classificar pontos e segmentos contra primitivas.
-- Combinar classificações nos nós da árvore (SMC).
-- Executar operações e análises sobre a árvore.
+- Classificar arestas e pontos contra primitivas.
+- Combinar classificações nos nós booleanos e transformar entidades nos nós de movimento rígido.
+- Calcular a primeira interseção de um raio e a normal no ponto.
+- Calcular o volume pela octree gerada da árvore.
 - Não depender de GLFW, OpenGL ou Dear ImGui.
 
 ### Aplicação
@@ -51,13 +52,13 @@ Núcleo geométrico
 
 ### Persistência
 
-- Salvar e ler árvores no formato definido em sala.
+- Salvar e ler árvores no formato do quadro.
 - Rejeitar arquivos inválidos ou incompletos.
 
 ### Renderização
 
-- Gerar a imagem por ray-casting com classificação SMC.
-- Exibir as partes IN, ON e OUT com cores distintas.
+- Gerar a imagem por ray-casting.
+- Exibir as partes IN, ON e OUT de arestas com cores distintas.
 - Não alterar o modelo geométrico.
 
 ### Interface
@@ -65,25 +66,36 @@ Núcleo geométrico
 - Coletar parâmetros, acionar casos de uso e apresentar erros.
 - Não conter algoritmos do núcleo.
 
+## Invariantes
+
+- Toda folha é uma primitiva; toda primitiva é folha.
+- Um nó booleano tem dois filhos; um nó de movimento rígido tem um filho.
+- Primitivas são definidas em posição canônica; translação e rotação são nós.
+- A escala altera os parâmetros da primitiva.
+- O cilindro tem eixo `z`, raio `r` e altura `h`, com base em `z = 0`.
+- Bloco e esfera são centrados na origem.
+- As operações booleanas são regularizadas.
+- O volume é a soma das folhas cheias da octree, classificadas pelo centro.
+
 ## Fluxo principal
 
 ```text
 Parâmetros da primitiva
-→ folha da árvore CSG
-→ composição por operações
+→ folha canônica
+→ nós de movimento rígido e operações booleanas
 → classificação SMC
-→ análise, persistência ou renderização
+→ ray-casting, exibição IN/ON/OUT, volume ou persistência
 ```
 
 ## Qualidade e validação
 
 - Testes do núcleo não abrem janela nem criam contexto OpenGL.
-- Cada operação é testada com folhas e com nós internos.
+- Cada primitiva, operação booleana e movimento rígido tem testes de classificação.
 - A persistência tem testes de ida e volta e de rejeição.
 - Um card só é concluído após compilação e testes em Linux.
 
-## Pendências
+## Deduções a verificar
 
-- Técnica de modelagem local ou global, definida em sala.
-- Formato de arquivo, definido em sala.
-- Algoritmos de SMC, volume e transformações, conforme as notas da unidade 3.
+- Bloco e esfera centrados na origem.
+- Rotação `R = Rz · Ry · Rx`, em graus, conforme Mortenson.
+- Movimento rígido em nó interno no arquivo, conforme a ADR-0005.
