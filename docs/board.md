@@ -10,6 +10,7 @@ Um card está concluído quando atende aos requisitos, compila e passa nos teste
 | --- | --- | --- | --- |
 | `C01` | Configurar o projeto | C++17, CMake, GLFW, OpenGL, Dear ImGui e GoogleTest. Compilação e testes em Linux. | Marcos |
 | `C02` | Definir a árvore CSG | Nós de primitiva, operação booleana e movimento rígido. Primitivas sempre folhas. | Marcos |
+| `C03` | Gerar bloco e esfera | Primitivas canônicas parametrizadas. Classificação de ponto e de aresta contra cada primitiva. | Marcos |
 
 ## Em andamento
 
@@ -21,7 +22,6 @@ Um card está concluído quando atende aos requisitos, compila e passa nos teste
 
 | ID | Título | Requisitos | Responsável |
 | --- | --- | --- | --- |
-| `C03` | Gerar bloco e esfera | Primitivas canônicas parametrizadas. Classificação de ponto e de aresta contra cada primitiva. | A definir |
 | `C04` | Aplicar a modelagem local | Translação e rotação como nós da árvore. Entidade levada ao sistema do filho pela inversa. | A definir |
 | `C05` | Salvar e ler árvores | Formato do quadro. Rejeição de arquivos inválidos. | A definir |
 | `C06` | Implementar a união | Operação sobre as árvores, não sobre as primitivas. | A definir |

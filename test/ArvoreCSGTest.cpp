@@ -3,6 +3,7 @@
 #include <limits>
 #include <memory>
 #include <stdexcept>
+#include <vector>
 
 #include "Core/ArvoreCSG.h"
 
@@ -21,6 +22,20 @@ namespace
       ETipoPrimitiva Tipo() const override
       {
         return tipo;
+      }
+
+      EClassificacao ClassificaPonto(
+        const TVetor3D&
+      ) const override
+      {
+        return EClassificacao::OUT;
+      }
+
+      std::vector<double> IntersecoesComFronteira(
+        const TAresta&
+      ) const override
+      {
+        return {};
       }
 
     private:

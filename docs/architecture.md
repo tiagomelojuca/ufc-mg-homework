@@ -6,7 +6,7 @@ Construir um modelador de sólidos por CSG em C++ e Linux, com modelagem local. 
 
 ## Estado atual
 
-A infraestrutura está pronta: CMake, janela GLFW/OpenGL com Dear ImGui e GoogleTest. O núcleo contém a árvore CSG: `TNoCSG` representa os três tipos de nó, e `TArvoreCSG` aponta para a raiz. Os nós são imutáveis e compartilháveis, de modo que uma operação nunca altera suas entradas. `TPrimitiva` define o contrato das primitivas; bloco e esfera ainda não foram implementados. As camadas `Persistence` e `Application` ainda não têm fontes.
+A infraestrutura está pronta: CMake, janela GLFW/OpenGL com Dear ImGui e GoogleTest. O núcleo contém a árvore CSG: `TNoCSG` representa os três tipos de nó, e `TArvoreCSG` aponta para a raiz. Os nós são imutáveis e compartilháveis, de modo que uma operação nunca altera suas entradas. `TPrimitiva` define o contrato das primitivas: classificar um ponto e classificar uma aresta em partes IN, ON e OUT. `TBloco` e `TEsfera` implementam esse contrato em posição canônica. As camadas `Persistence` e `Application` ainda não têm fontes.
 
 ## Camadas
 
@@ -74,6 +74,7 @@ Núcleo geométrico
 - A escala altera os parâmetros da primitiva.
 - O cilindro tem eixo `z`, raio `r` e altura `h`, com base em `z = 0`.
 - Bloco e esfera são centrados na origem.
+- A classificação de uma aresta contra uma primitiva cobre todo o intervalo `t ∈ [0, 1]`, em partes ordenadas e sem sobreposição.
 - As operações booleanas são regularizadas.
 - O volume é a soma das folhas cheias da octree, classificadas pelo centro.
 
