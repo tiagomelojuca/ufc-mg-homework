@@ -6,7 +6,7 @@ Construir um modelador de sólidos por CSG em C++ e Linux, com modelagem local. 
 
 ## Estado atual
 
-A infraestrutura está pronta: CMake, janela GLFW/OpenGL com Dear ImGui e GoogleTest. O núcleo contém a árvore CSG: `TNoCSG` representa os três tipos de nó, e `TArvoreCSG` aponta para a raiz. Os nós são imutáveis e compartilháveis, de modo que uma operação nunca altera suas entradas. `TPrimitiva` define o contrato das primitivas: classificar um ponto e classificar uma aresta em partes IN, ON e OUT. `TBloco` e `TEsfera` implementam esse contrato em posição canônica, pelas equações das aulas. `TMatriz4x4` representa as transformações em coordenadas homogêneas; cada `TMovimentoRigido` fornece sua matriz e a inversa, que leva pontos e arestas ao sistema do filho. As camadas `Persistence` e `Application` ainda não têm fontes.
+A infraestrutura está pronta: CMake, janela GLFW/OpenGL com Dear ImGui e GoogleTest. O núcleo contém a árvore CSG: `TNoCSG` representa os três tipos de nó, e `TArvoreCSG` aponta para a raiz. Os nós são imutáveis e compartilháveis, de modo que uma operação nunca altera suas entradas. `TPrimitiva` define o contrato das primitivas: classificar um ponto e classificar uma aresta em partes IN, ON e OUT. `TBloco` e `TEsfera` implementam esse contrato em posição canônica, pelas equações das aulas. `TMatriz4x4` representa as transformações em coordenadas homogêneas; cada `TMovimentoRigido` fornece sua matriz e a inversa, que leva pontos e arestas ao sistema do filho. `TPersistenciaCSG`, em `Persistence`, codifica a árvore no formato do quadro e a reconstrói a partir do texto, informando a linha de cada erro. A camada `Application` ainda não tem fontes.
 
 ## Camadas
 
@@ -53,7 +53,10 @@ Núcleo geométrico
 ### Persistência
 
 - Salvar e ler árvores no formato do quadro.
-- Rejeitar arquivos inválidos ou incompletos.
+- Rejeitar arquivos inválidos ou incompletos, indicando a linha do erro.
+- Escrever movimentos rígidos na linha da árvore que movem, na ordem de aplicação.
+- Escrever uma única vez cada subárvore compartilhada.
+- Usar ponto decimal, independente da configuração regional.
 
 ### Renderização
 
