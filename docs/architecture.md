@@ -6,7 +6,7 @@ Construir um modelador de sólidos por CSG em C++ e Linux, com modelagem local. 
 
 ## Estado atual
 
-A infraestrutura está pronta: CMake, janela GLFW/OpenGL com Dear ImGui e GoogleTest. O núcleo contém a árvore CSG: `TNoCSG` representa os três tipos de nó, e `TArvoreCSG` aponta para a raiz. Os nós são imutáveis e compartilháveis, de modo que uma operação nunca altera suas entradas. `TPrimitiva` define o contrato das primitivas: classificar um ponto e classificar uma aresta em partes IN, ON e OUT. `TBloco` e `TEsfera` implementam esse contrato em posição canônica. As camadas `Persistence` e `Application` ainda não têm fontes.
+A infraestrutura está pronta: CMake, janela GLFW/OpenGL com Dear ImGui e GoogleTest. O núcleo contém a árvore CSG: `TNoCSG` representa os três tipos de nó, e `TArvoreCSG` aponta para a raiz. Os nós são imutáveis e compartilháveis, de modo que uma operação nunca altera suas entradas. `TPrimitiva` define o contrato das primitivas: classificar um ponto e classificar uma aresta em partes IN, ON e OUT. `TBloco` e `TEsfera` implementam esse contrato em posição canônica, pelas equações das aulas. `TMatriz4x4` representa as transformações em coordenadas homogêneas; cada `TMovimentoRigido` fornece sua matriz e a inversa, que leva pontos e arestas ao sistema do filho. As camadas `Persistence` e `Application` ainda não têm fontes.
 
 ## Camadas
 
@@ -71,6 +71,8 @@ Núcleo geométrico
 - Toda folha é uma primitiva; toda primitiva é folha.
 - Um nó booleano tem dois filhos; um nó de movimento rígido tem um filho.
 - Primitivas são definidas em posição canônica; translação e rotação são nós.
+- A rotação é `R = Rz · Ry · Rx`; sua inversa é `Rx(−x) · Ry(−y) · Rz(−z)`.
+- Levar uma aresta ao sistema do filho preserva o parâmetro `t` de cada ponto.
 - A escala altera os parâmetros da primitiva.
 - O cilindro tem eixo `z`, raio `r` e altura `h`, com base em `z = 0`.
 - Bloco e esfera são centrados na origem.

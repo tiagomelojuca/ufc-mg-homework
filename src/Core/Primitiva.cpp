@@ -6,46 +6,6 @@
 
 //----------------------------------------------------------------------------------------------
 
-TClassificacaoAresta TPrimitiva::ClassificaAresta(
-  const TAresta& aresta
-) const
-{
-  std::vector<double> parametros = { 0.0, 1.0 };
-  for (double t : IntersecoesComFronteira(aresta)) {
-    if (t > TOLERANCIA_GEOMETRICA && t < 1.0 - TOLERANCIA_GEOMETRICA) {
-      parametros.push_back(t);
-    }
-  }
-
-  std::sort(parametros.begin(), parametros.end());
-  parametros.erase(
-    std::unique(
-      parametros.begin(),
-      parametros.end(),
-      [](double a, double b) { return b - a <= TOLERANCIA_GEOMETRICA; }
-    ),
-    parametros.end()
-  );
-
-  // Entre duas interseções consecutivas a classificação não muda; basta testar o ponto médio.
-  TClassificacaoAresta classificacao;
-  for (std::size_t i = 0; i + 1 < parametros.size(); ++i) {
-    const double tInicio = parametros[i];
-    const double tFim = parametros[i + 1];
-    const EClassificacao estado = ClassificaPonto(aresta.Ponto((tInicio + tFim) / 2.0));
-
-    if (!classificacao.empty() && classificacao.back().classificacao == estado) {
-      classificacao.back().tFim = tFim;
-    } else {
-      classificacao.push_back({ tInicio, tFim, estado });
-    }
-  }
-
-  return classificacao;
-}
-
-//----------------------------------------------------------------------------------------------
-
 void TPrimitiva::ExigeDimensaoPositiva(
   double valor,
   const char* mensagem
@@ -71,6 +31,36 @@ EClassificacao TPrimitiva::ClassificaPorDistancia(
   }
 
   return EClassificacao::ON;
+}
+
+//----------------------------------------------------------------------------------------------
+
+TClassificacaoAresta TPrimitiva::ClassificaPorIntervalo(
+  double tEntrada,
+  double tSaida,
+  EClassificacao classificacaoInterna
+)
+{
+  const double inicio = std::max(tEntrada, 0.0);
+  const double fim = std::min(tSaida, 1.0);
+
+  // Um intervalo vazio ou reduzido a um ponto (tangência) não tem comprimento: a aresta fica fora.
+  if (fim - inicio <= TOLERANCIA_GEOMETRICA) {
+    return { { 0.0, 1.0, EClassificacao::OUT } };
+  }
+
+  TClassificacaoAresta classificacao;
+  if (inicio > TOLERANCIA_GEOMETRICA) {
+    classificacao.push_back({ 0.0, inicio, EClassificacao::OUT });
+  }
+
+  classificacao.push_back({ inicio, fim, classificacaoInterna });
+
+  if (fim < 1.0 - TOLERANCIA_GEOMETRICA) {
+    classificacao.push_back({ fim, 1.0, EClassificacao::OUT });
+  }
+
+  return classificacao;
 }
 
 //----------------------------------------------------------------------------------------------

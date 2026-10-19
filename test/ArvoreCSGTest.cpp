@@ -3,7 +3,6 @@
 #include <limits>
 #include <memory>
 #include <stdexcept>
-#include <vector>
 
 #include "Core/ArvoreCSG.h"
 
@@ -31,11 +30,11 @@ namespace
         return EClassificacao::OUT;
       }
 
-      std::vector<double> IntersecoesComFronteira(
+      TClassificacaoAresta ClassificaAresta(
         const TAresta&
       ) const override
       {
-        return {};
+        return { { 0.0, 1.0, EClassificacao::OUT } };
       }
 
     private:

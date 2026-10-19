@@ -3,6 +3,8 @@
 
 #include <memory>
 
+#include "Classificacao.h"
+#include "Matriz4x4.h"
 #include "Primitiva.h"
 #include "Vetor3D.h"
 
@@ -47,6 +49,20 @@ class TMovimentoRigido
 
     ETipoMovimentoRigido Tipo() const;
     const TVetor3D& Valores() const;
+
+    // Leva do sistema do filho ao sistema do pai. A rotação é R = Rz · Ry · Rx.
+    TMatriz4x4 Matriz() const;
+
+    // Leva do sistema do pai ao sistema do filho, desfazendo o movimento.
+    TMatriz4x4 MatrizInversa() const;
+
+    TVetor3D LevaAoSistemaDoFilho(
+      const TVetor3D& ponto
+    ) const;
+
+    TAresta LevaAoSistemaDoFilho(
+      const TAresta& aresta
+    ) const;
 
   private:
     ETipoMovimentoRigido tipo;

@@ -1,8 +1,6 @@
 #ifndef ESFERA_H_
 #define ESFERA_H_
 
-#include <vector>
-
 #include "Primitiva.h"
 
 //----------------------------------------------------------------------------------------------
@@ -22,7 +20,7 @@ class TEsfera : public TPrimitiva
       const TVetor3D& ponto
     ) const override;
 
-    std::vector<double> IntersecoesComFronteira(
+    TClassificacaoAresta ClassificaAresta(
       const TAresta& aresta
     ) const override;
 

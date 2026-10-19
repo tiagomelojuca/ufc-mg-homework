@@ -2,22 +2,40 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 
 namespace
 {
-  void AcrescentaIntersecoesComPlanos(
+  // Intervalo de t em que a aresta está na faixa entre dois planos paralelos do bloco.
+  struct TIntervaloFaixa
+  {
+    double tEntrada;
+    double tSaida;
+    bool sobrePlano;
+  };
+
+  TIntervaloFaixa IntersectaFaixa(
     double origem,
     double direcao,
-    double meioLado,
-    std::vector<double>& intersecoes
+    double meioLado
   )
   {
+    const double infinito = std::numeric_limits<double>::infinity();
+
+    // Aresta paralela aos dois planos: fica inteira dentro, inteira fora ou sobre um deles.
     if (direcao == 0.0) {
-      return;
+      const double distancia = std::abs(origem) - meioLado;
+      if (distancia > TOLERANCIA_GEOMETRICA) {
+        return { infinito, -infinito, false };
+      }
+
+      return { -infinito, infinito, distancia >= -TOLERANCIA_GEOMETRICA };
     }
 
-    intersecoes.push_back((-meioLado - origem) / direcao);
-    intersecoes.push_back((meioLado - origem) / direcao);
+    const double t1 = (-meioLado - origem) / direcao;
+    const double t2 = (meioLado - origem) / direcao;
+
+    return { std::min(t1, t2), std::max(t1, t2), false };
   }
 }
 
@@ -84,19 +102,35 @@ EClassificacao TBloco::ClassificaPonto(
 
 //----------------------------------------------------------------------------------------------
 
-std::vector<double> TBloco::IntersecoesComFronteira(
+TClassificacaoAresta TBloco::ClassificaAresta(
   const TAresta& aresta
 ) const
 {
+  // O bloco é a interseção de três faixas, cada uma limitada por dois dos seis planos das faces.
   const TVetor3D origem = aresta.Inicio();
   const TVetor3D direcao = aresta.Direcao();
 
-  std::vector<double> intersecoes;
-  AcrescentaIntersecoesComPlanos(origem.x, direcao.x, ladoX / 2.0, intersecoes);
-  AcrescentaIntersecoesComPlanos(origem.y, direcao.y, ladoY / 2.0, intersecoes);
-  AcrescentaIntersecoesComPlanos(origem.z, direcao.z, ladoZ / 2.0, intersecoes);
+  const TIntervaloFaixa faixas[] = {
+    IntersectaFaixa(origem.x, direcao.x, ladoX / 2.0),
+    IntersectaFaixa(origem.y, direcao.y, ladoY / 2.0),
+    IntersectaFaixa(origem.z, direcao.z, ladoZ / 2.0)
+  };
 
-  return intersecoes;
+  double tEntrada = -std::numeric_limits<double>::infinity();
+  double tSaida = std::numeric_limits<double>::infinity();
+  bool sobreFace = false;
+
+  for (const TIntervaloFaixa& faixa : faixas) {
+    tEntrada = std::max(tEntrada, faixa.tEntrada);
+    tSaida = std::min(tSaida, faixa.tSaida);
+    sobreFace = sobreFace || faixa.sobrePlano;
+  }
+
+  return ClassificaPorIntervalo(
+    tEntrada,
+    tSaida,
+    sobreFace ? EClassificacao::ON : EClassificacao::IN
+  );
 }
 
 //----------------------------------------------------------------------------------------------

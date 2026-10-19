@@ -37,7 +37,7 @@ EClassificacao TEsfera::ClassificaPonto(
 
 //----------------------------------------------------------------------------------------------
 
-std::vector<double> TEsfera::IntersecoesComFronteira(
+TClassificacaoAresta TEsfera::ClassificaAresta(
   const TAresta& aresta
 ) const
 {
@@ -50,19 +50,21 @@ std::vector<double> TEsfera::IntersecoesComFronteira(
   const double c = ProdutoEscalar(p, p) - raio * raio;
 
   if (a == 0.0) {
-    return {};
+    return { { 0.0, 1.0, ClassificaPonto(p) } };
   }
 
+  // Sem solução, a aresta não intercepta; com raiz dupla, apenas tangencia.
   const double discriminante = b * b - 4.0 * a * c;
-  if (discriminante < 0.0) {
-    return {};
+  if (discriminante <= 0.0) {
+    return { { 0.0, 1.0, EClassificacao::OUT } };
   }
 
+  // Com duas raízes, a reta está dentro da esfera entre elas.
   const double raizDiscriminante = std::sqrt(discriminante);
-  return {
-    (-b - raizDiscriminante) / (2.0 * a),
-    (-b + raizDiscriminante) / (2.0 * a)
-  };
+  const double t1 = (-b - raizDiscriminante) / (2.0 * a);
+  const double t2 = (-b + raizDiscriminante) / (2.0 * a);
+
+  return ClassificaPorIntervalo(t1, t2, EClassificacao::IN);
 }
 
 //----------------------------------------------------------------------------------------------

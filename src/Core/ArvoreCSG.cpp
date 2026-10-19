@@ -48,6 +48,56 @@ const TVetor3D& TMovimentoRigido::Valores() const
 
 //----------------------------------------------------------------------------------------------
 
+TMatriz4x4 TMovimentoRigido::Matriz() const
+{
+  if (tipo == ETipoMovimentoRigido::TRANSLACAO) {
+    return TMatriz4x4::Translacao(valores);
+  }
+
+  return
+    TMatriz4x4::RotacaoZ(valores.z) *
+    TMatriz4x4::RotacaoY(valores.y) *
+    TMatriz4x4::RotacaoX(valores.x);
+}
+
+//----------------------------------------------------------------------------------------------
+
+TMatriz4x4 TMovimentoRigido::MatrizInversa() const
+{
+  if (tipo == ETipoMovimentoRigido::TRANSLACAO) {
+    return TMatriz4x4::Translacao(-1.0 * valores);
+  }
+
+  // A inversa de Rz · Ry · Rx desfaz as rotações em ordem contrária e com ângulos opostos.
+  return
+    TMatriz4x4::RotacaoX(-valores.x) *
+    TMatriz4x4::RotacaoY(-valores.y) *
+    TMatriz4x4::RotacaoZ(-valores.z);
+}
+
+//----------------------------------------------------------------------------------------------
+
+TVetor3D TMovimentoRigido::LevaAoSistemaDoFilho(
+  const TVetor3D& ponto
+) const
+{
+  return MatrizInversa().TransformaPonto(ponto);
+}
+
+//----------------------------------------------------------------------------------------------
+
+// A transformação é afim, então o ponto de parâmetro t continua com o mesmo t no sistema do
+// filho; a classificação obtida lá vale sem conversão para a aresta original.
+TAresta TMovimentoRigido::LevaAoSistemaDoFilho(
+  const TAresta& aresta
+) const
+{
+  const TMatriz4x4 inversa = MatrizInversa();
+  return TAresta(inversa.TransformaPonto(aresta.Inicio()), inversa.TransformaPonto(aresta.Fim()));
+}
+
+//----------------------------------------------------------------------------------------------
+
 TNoCSG::TNoCSG(
   std::shared_ptr<const TPrimitiva> primitiva
 ) :

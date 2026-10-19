@@ -1,8 +1,6 @@
 #ifndef BLOCO_H_
 #define BLOCO_H_
 
-#include <vector>
-
 #include "Primitiva.h"
 
 //----------------------------------------------------------------------------------------------
@@ -26,7 +24,7 @@ class TBloco : public TPrimitiva
       const TVetor3D& ponto
     ) const override;
 
-    std::vector<double> IntersecoesComFronteira(
+    TClassificacaoAresta ClassificaAresta(
       const TAresta& aresta
     ) const override;
 
