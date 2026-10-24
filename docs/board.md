@@ -14,6 +14,8 @@ Um card está concluído quando atende aos requisitos, compila e passa nos teste
 | `C04` | Aplicar a modelagem local | Translação e rotação como nós da árvore. Entidade levada ao sistema do filho pela inversa. | Marcos |
 | `C05` | Salvar e ler árvores | Formato do quadro. Rejeição de arquivos inválidos. | Marcos |
 | `C06` | Implementar a união | Operação sobre as árvores, não sobre as primitivas. | Luis |
+| `C07` | Implementar escala e translação | Escala pelos parâmetros da primitiva. Translação como nó da árvore. | A definir |
+
 ## Em andamento
 
 | ID | Título | Requisitos | Responsável |
@@ -24,7 +26,6 @@ Um card está concluído quando atende aos requisitos, compila e passa nos teste
 
 | ID | Título | Requisitos | Responsável |
 | --- | --- | --- | --- |
-| `C07` | Implementar escala e translação | Escala pelos parâmetros da primitiva. Translação como nó da árvore. | A definir |
 | `C08` | Calcular o volume | Conversão em octree. Classificação pelo centro da célula. | A definir |
 | `C09` | Implementar a classificação SMC | `Tree_M`, `Prim_M` e `Combine_M` regularizado. Partes IN, ON e OUT. | A definir |
 | `C10` | Renderizar por ray-casting | Primeira interseção do raio com a árvore. Iluminação pela normal. | A definir |
