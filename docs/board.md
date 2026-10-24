@@ -14,7 +14,7 @@ Um card está concluído quando atende aos requisitos, compila e passa nos teste
 | `C04` | Aplicar a modelagem local | Translação e rotação como nós da árvore. Entidade levada ao sistema do filho pela inversa. | Marcos |
 | `C05` | Salvar e ler árvores | Formato do quadro. Rejeição de arquivos inválidos. | Marcos |
 | `C06` | Implementar a união | Operação sobre as árvores, não sobre as primitivas. | Luis |
-| `C07` | Implementar escala e translação | Escala pelos parâmetros da primitiva. Translação como nó da árvore. | A definir |
+| `C07` | Implementar escala e translação | Escala pelos parâmetros da primitiva. Translação como nó da árvore. | Luis |
 
 ## Em andamento
 
