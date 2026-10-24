@@ -67,8 +67,9 @@ EClassificacao CombinaClassificacoes(EOperacaoBooleana operacao,
   case EOperacaoBooleana::INTERSECAO:
   case EOperacaoBooleana::DIFERENCA:
     throw std::logic_error("Operacao booleana ainda nao implementada");
+ 
   }
-
+  
   throw std::logic_error("Operacao booleana desconhecida");
 }
 
@@ -117,6 +118,12 @@ EClassificacao ClassificaPonto(const TArvoreCSG &arvore,
     return CombinaClassificacoes(arvore->Operacao(),
                                  ClassificaPonto(arvore->Esquerda(), ponto),
                                  ClassificaPonto(arvore->Direita(), ponto));
+
+   case ETipoNoCSG::ESCALA:
+        return ClassificaPonto(
+          arvore->Filho(),
+          arvore->Escala().LevaAoSistemaDoFilho(ponto)
+        );  
   }
 
   throw std::logic_error("Tipo de no desconhecido");
@@ -140,6 +147,11 @@ TClassificacaoAresta ClassificaAresta(const TArvoreCSG &arvore,
     return CombinaArestas(arvore->Operacao(),
                           ClassificaAresta(arvore->Esquerda(), aresta),
                           ClassificaAresta(arvore->Direita(), aresta));
+     case ETipoNoCSG::ESCALA:
+      return ClassificaAresta(
+        arvore->Filho(),
+        arvore->Escala().LevaAoSistemaDoFilho(aresta)
+      );
   }
 
   throw std::logic_error("Tipo de no desconhecido");
