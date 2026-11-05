@@ -22,6 +22,36 @@ namespace
 
   //--------------------------------------------------------------------------------------------
 
+  // Base ortonormal da câmera e meias dimensões do plano de imagem a distância 1 dela.
+  struct TReferencialCamera
+  {
+    TVetor3D frente;
+    TVetor3D direita;
+    TVetor3D cima;
+    double meiaLargura;
+    double meiaAltura;
+  };
+
+  //--------------------------------------------------------------------------------------------
+
+  TReferencialCamera MontaReferencial(
+    const TCamera& camera,
+    int largura,
+    int altura
+  )
+  {
+    const TVetor3D frente = Normaliza(camera.alvo - camera.posicao);
+    const TVetor3D direita = Normaliza(ProdutoVetorial(frente, camera.cima));
+    const TVetor3D cima = ProdutoVetorial(direita, frente);
+
+    const double meiaAltura = std::tan(camera.campoDeVisaoGraus * PI / 360.0);
+    const double meiaLargura = meiaAltura * largura / altura;
+
+    return { frente, direita, cima, meiaLargura, meiaAltura };
+  }
+
+  //--------------------------------------------------------------------------------------------
+
   unsigned char ComponenteEmByte(
     double componente
   )
@@ -106,19 +136,72 @@ TAresta RaioDoPixel(
   int altura
 )
 {
-  const TVetor3D frente = Normaliza(camera.alvo - camera.posicao);
-  const TVetor3D direita = Normaliza(ProdutoVetorial(frente, camera.cima));
-  const TVetor3D cima = ProdutoVetorial(direita, frente);
+  const TReferencialCamera referencial = MontaReferencial(camera, largura, altura);
 
   // Coordenadas do centro do pixel no plano de imagem a distância 1 da câmera.
-  const double meiaAltura = std::tan(camera.campoDeVisaoGraus * PI / 360.0);
-  const double meiaLargura = meiaAltura * largura / altura;
-  const double x = (2.0 * (coluna + 0.5) / largura - 1.0) * meiaLargura;
-  const double y = (1.0 - 2.0 * (linha + 0.5) / altura) * meiaAltura;
+  const double x = (2.0 * (coluna + 0.5) / largura - 1.0) * referencial.meiaLargura;
+  const double y = (1.0 - 2.0 * (linha + 0.5) / altura) * referencial.meiaAltura;
 
-  const TVetor3D direcao = Normaliza(frente + x * direita + y * cima);
+  const TVetor3D direcao =
+    Normaliza(referencial.frente + x * referencial.direita + y * referencial.cima);
 
   return TAresta(camera.posicao, camera.posicao + alcance * direcao);
+}
+
+//----------------------------------------------------------------------------------------------
+
+TPontoImagem ProjetaPonto(
+  const TCamera& camera,
+  const TVetor3D& ponto,
+  int largura,
+  int altura
+)
+{
+  const TReferencialCamera referencial = MontaReferencial(camera, largura, altura);
+  const TVetor3D relativo = ponto - camera.posicao;
+
+  // Divisão perspectiva: o ponto é levado ao plano de imagem a distância 1 da câmera.
+  const double profundidade = ProdutoEscalar(relativo, referencial.frente);
+  const double x = ProdutoEscalar(relativo, referencial.direita) / profundidade;
+  const double y = ProdutoEscalar(relativo, referencial.cima) / profundidade;
+
+  return {
+    (x / referencial.meiaLargura + 1.0) * largura / 2.0,
+    (1.0 - y / referencial.meiaAltura) * altura / 2.0
+  };
+}
+
+//----------------------------------------------------------------------------------------------
+
+std::optional<TAresta> RecortaAFrenteDaCamera(
+  const TCamera& camera,
+  const TAresta& aresta
+)
+{
+  // Profundidade mínima que evita a divisão por valores próximos de zero na projeção.
+  constexpr double PROFUNDIDADE_MINIMA = 1e-3;
+
+  const TVetor3D frente = Normaliza(camera.alvo - camera.posicao);
+  const double profundidadeInicio = ProdutoEscalar(aresta.Inicio() - camera.posicao, frente);
+  const double profundidadeFim = ProdutoEscalar(aresta.Fim() - camera.posicao, frente);
+
+  const bool inicioAFrente = profundidadeInicio >= PROFUNDIDADE_MINIMA;
+  const bool fimAFrente = profundidadeFim >= PROFUNDIDADE_MINIMA;
+
+  if (inicioAFrente && fimAFrente) {
+    return aresta;
+  }
+
+  if (!inicioAFrente && !fimAFrente) {
+    return std::nullopt;
+  }
+
+  // A profundidade varia linearmente com t; o corte fica onde ela vale o mínimo.
+  const double t =
+    (PROFUNDIDADE_MINIMA - profundidadeInicio) / (profundidadeFim - profundidadeInicio);
+  const TVetor3D corte = aresta.Ponto(t);
+
+  return inicioAFrente ? TAresta(aresta.Inicio(), corte) : TAresta(corte, aresta.Fim());
 }
 
 //----------------------------------------------------------------------------------------------

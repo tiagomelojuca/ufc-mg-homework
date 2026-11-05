@@ -18,6 +18,7 @@ Um card está concluído quando atende aos requisitos, compila e passa nos teste
 | `C08` | Calcular o volume | Conversão em octree. Classificação pelo centro da célula. | Felipe |
 | `C09` | Implementar a classificação SMC | `Tree_M`, `Prim_M` e `Combine_M` regularizado. Partes IN, ON e OUT. | Tiago |
 | `C10` | Renderizar por ray-casting | Primeira interseção do raio com a árvore. Iluminação pela normal. | Tiago |
+| `C11` | Exibir a SMC graficamente | Cores distintas para IN, ON e OUT. | Tiago |
 
 ## Em andamento
 
@@ -29,7 +30,6 @@ Um card está concluído quando atende aos requisitos, compila e passa nos teste
 
 | ID | Título | Requisitos | Responsável |
 | --- | --- | --- | --- |
-| `C11` | Exibir a SMC graficamente | Cores distintas para IN, ON e OUT. | A definir |
 | `C12` | Integrar operações à interface | Criação, operações, análise e arquivos acessíveis pela interface. | A definir |
 | `C13` | Construir o tema | Ford Escort em 3D com as operações implementadas. | A definir |
 | `C14` | Validar o MVP | Fluxo completo e testes aprovados em Linux. | A definir |

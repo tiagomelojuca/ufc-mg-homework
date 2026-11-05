@@ -32,6 +32,8 @@ O raio é representado por uma aresta finita que parte da câmera e passa de tod
 
 A exibição da SMC classifica arestas finitas contra a árvore e desenha cada parte com a cor de IN, ON ou OUT.
 
+As arestas são projetadas com a mesma câmera do ray-casting e desenhadas sobre a imagem, sem ocultação pelo sólido, para que as partes IN fiquem visíveis. IN é verde, ON é amarelo e OUT é vermelho. A parte de uma aresta atrás da câmera é recortada antes da projeção.
+
 ## Consequências
 
 - Ray-casting e exibição da SMC compartilham `Prim_M` e `Combine_M`.

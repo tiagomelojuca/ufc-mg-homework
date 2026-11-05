@@ -15,6 +15,7 @@ TPainelRayCasting::TPainelRayCasting(
   TArvoreCSG arvore
 ) :
   arvore(std::move(arvore)),
+  exibicaoSMC(this->arvore),
   azimuteGraus(35.0f),
   elevacaoGraus(25.0f),
   distancia(8.0f),
@@ -32,6 +33,7 @@ void TPainelRayCasting::DefineArvore(
 )
 {
   arvore = std::move(novaArvore);
+  exibicaoSMC.DefineArvore(arvore);
   precisaRenderizar = true;
 }
 
@@ -56,9 +58,12 @@ void TPainelRayCasting::Desenha()
       static_cast<ImTextureID>(static_cast<std::uintptr_t>(textura)),
       ImVec2(static_cast<float>(largura), static_cast<float>(altura))
     );
+    exibicaoSMC.DesenhaSobreImagem(MontaCena().camera, ImGui::GetItemRectMin(), largura, altura);
   } else {
     ImGui::TextUnformatted("Nenhum modelo para exibir.");
   }
+
+  exibicaoSMC.DesenhaControles();
 
   ImGui::End();
 }

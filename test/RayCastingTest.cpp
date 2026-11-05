@@ -257,3 +257,73 @@ TEST(RayCastingTest, deve_rejeitar_dimensoes_invalidas)
 }
 
 //----------------------------------------------------------------------------------------------
+
+TEST(RayCastingTest, deve_projetar_o_alvo_no_centro_da_imagem)
+{
+  const TCena cena = CriaCena();
+
+  const TPontoImagem projetado = ProjetaPonto(cena.camera, { 0.0, 0.0, 0.0 }, 480, 360);
+
+  EXPECT_NEAR(projetado.coluna, 240.0, TOLERANCIA);
+  EXPECT_NEAR(projetado.linha, 180.0, TOLERANCIA);
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(RayCastingTest, deve_projetar_um_ponto_do_raio_no_centro_do_seu_pixel)
+{
+  TCena cena = CriaCena();
+  cena.camera = { { 3.0, 2.0, 6.0 }, { 0.5, -0.5, 0.0 }, { 0.0, 1.0, 0.0 }, 50.0 };
+
+  // Qualquer ponto do raio de um pixel aparece no centro desse pixel.
+  const TAresta raio = RaioDoPixel(cena.camera, 10.0, 37, 211, 320, 240);
+  const TPontoImagem projetado = ProjetaPonto(cena.camera, raio.Ponto(0.6), 320, 240);
+
+  EXPECT_NEAR(projetado.coluna, 37.5, 1e-6);
+  EXPECT_NEAR(projetado.linha, 211.5, 1e-6);
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(RayCastingTest, deve_manter_a_aresta_toda_a_frente_da_camera)
+{
+  const TCena cena = CriaCena();
+  const TAresta aresta({ -1.0, 0.0, 0.0 }, { 1.0, 0.0, 0.0 });
+
+  const std::optional<TAresta> recortada = RecortaAFrenteDaCamera(cena.camera, aresta);
+
+  ASSERT_TRUE(recortada.has_value());
+  EsperaVetor(recortada->Inicio(), aresta.Inicio());
+  EsperaVetor(recortada->Fim(), aresta.Fim());
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(RayCastingTest, deve_descartar_a_aresta_toda_atras_da_camera)
+{
+  const TCena cena = CriaCena();
+
+  EXPECT_FALSE(RecortaAFrenteDaCamera(
+    cena.camera,
+    TAresta({ -1.0, 0.0, 7.0 }, { 1.0, 0.0, 9.0 })
+  ).has_value());
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(RayCastingTest, deve_recortar_a_aresta_que_passa_por_tras_da_camera)
+{
+  // A câmera está em z = 5 olhando para -z; a parte com z > 5 fica atrás dela.
+  const TCena cena = CriaCena();
+
+  const std::optional<TAresta> recortada = RecortaAFrenteDaCamera(
+    cena.camera,
+    TAresta({ 0.0, 1.0, 0.0 }, { 0.0, 1.0, 10.0 })
+  );
+
+  ASSERT_TRUE(recortada.has_value());
+  EsperaVetor(recortada->Inicio(), { 0.0, 1.0, 0.0 });
+  EXPECT_NEAR(recortada->Fim().z, 5.0 - 1e-3, TOLERANCIA);
+}
+
+//----------------------------------------------------------------------------------------------

@@ -100,6 +100,27 @@ TAresta RaioDoPixel(
   int altura
 );
 
+// Posição na imagem, em pixels, com a origem no canto superior esquerdo.
+struct TPontoImagem
+{
+  double coluna;
+  double linha;
+};
+
+// Inverso de RaioDoPixel: onde o ponto aparece na imagem. O ponto deve estar à frente da câmera.
+TPontoImagem ProjetaPonto(
+  const TCamera& camera,
+  const TVetor3D& ponto,
+  int largura,
+  int altura
+);
+
+// Parte da aresta à frente da câmera, que pode ser projetada; vazio se a aresta fica toda atrás.
+std::optional<TAresta> RecortaAFrenteDaCamera(
+  const TCamera& camera,
+  const TAresta& aresta
+);
+
 // Modelo de Phong: ambiente, difusa pelo ângulo entre normal e luz, especular pelo ângulo entre
 // a reflexão da luz e o observador.
 TVetor3D Ilumina(
