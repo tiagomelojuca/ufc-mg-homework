@@ -31,7 +31,8 @@ class TPainelModelos
     enum class ETipoCriacao
     {
       BLOCO,
-      ESFERA
+      ESFERA,
+      CILINDRO
     };
 
     void DesenhaLista(
@@ -70,6 +71,7 @@ class TPainelModelos
     ETipoCriacao tipoCriacao;
     std::array<double, 3> lados;
     double raio;
+    double altura;
 
     std::array<double, 3> deslocamento;
     std::array<double, 3> angulos;

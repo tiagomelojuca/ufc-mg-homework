@@ -8,6 +8,7 @@
 
 #include "Core/Bloco.h"
 #include "Core/CaixaEnvolvente.h"
+#include "Core/Cilindro.h"
 #include "Core/Esfera.h"
 #include "Core/Octree.h"
 
@@ -85,6 +86,19 @@ TIdModelo TModelador::CriaEsfera(
 
 //----------------------------------------------------------------------------------------------
 
+TIdModelo TModelador::CriaCilindro(
+  double raio,
+  double altura
+)
+{
+  return Adiciona(
+    "Cilindro de raio " + FormataNumero(raio) + " e altura " + FormataNumero(altura),
+    CriaPrimitiva(std::make_shared<TCilindro>(raio, altura))
+  );
+}
+
+//----------------------------------------------------------------------------------------------
+
 TIdModelo TModelador::Une(
   TIdModelo esquerda,
   TIdModelo direita
@@ -93,6 +107,23 @@ TIdModelo TModelador::Une(
   return Adiciona(
     "União de " + Referencia(esquerda) + " e " + Referencia(direita),
     CriaOperacaoBooleana(EOperacaoBooleana::UNIAO, Modelo(esquerda).arvore, Modelo(direita).arvore)
+  );
+}
+
+//----------------------------------------------------------------------------------------------
+
+TIdModelo TModelador::Intersecta(
+  TIdModelo esquerda,
+  TIdModelo direita
+)
+{
+  return Adiciona(
+    "Interseção de " + Referencia(esquerda) + " e " + Referencia(direita),
+    CriaOperacaoBooleana(
+      EOperacaoBooleana::INTERSECAO,
+      Modelo(esquerda).arvore,
+      Modelo(direita).arvore
+    )
   );
 }
 

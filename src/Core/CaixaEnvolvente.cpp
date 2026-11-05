@@ -46,8 +46,10 @@ TCaixa CaixaEnvolvente(
         case EOperacaoBooleana::UNIAO:
           return UneCaixas(esquerda, direita);
 
-        // O resultado está contido no operando da esquerda.
         case EOperacaoBooleana::INTERSECAO:
+          return IntersectaCaixas(esquerda, direita);
+
+        // O resultado está contido no operando da esquerda.
         case EOperacaoBooleana::DIFERENCA:
           return esquerda;
       }

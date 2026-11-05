@@ -29,6 +29,24 @@ namespace
 
   //--------------------------------------------------------------------------------------------
 
+  EClassificacao Intersecao(
+    EClassificacao esquerda,
+    EClassificacao direita
+  )
+  {
+    if (esquerda == EClassificacao::OUT || direita == EClassificacao::OUT) {
+      return EClassificacao::OUT;
+    }
+
+    if (esquerda == EClassificacao::IN && direita == EClassificacao::IN) {
+      return EClassificacao::IN;
+    }
+
+    return EClassificacao::ON;
+  }
+
+  //--------------------------------------------------------------------------------------------
+
   // Trecho da aresta que contém o parâmetro t.
   const TSegmentoClassificado& SegmentoEm(
     const TClassificacaoAresta& classificacao,
@@ -245,9 +263,87 @@ namespace
 
   //--------------------------------------------------------------------------------------------
 
-  // Combina dois trechos de mesmo intervalo. Na união regularizada, um trecho ON dos dois lados
-  // está no interior quando as vizinhanças, somadas, envolvem toda a aresta, como em duas faces
-  // encostadas com normais opostas; caso contrário continua na fronteira.
+  // Acrescenta o cone à vizinhança se ainda não houver um igual, como os de faces coplanares do
+  // mesmo lado.
+  void AcrescentaCone(
+    TVizinhanca& vizinhanca,
+    const TConeVizinhanca& cone
+  )
+  {
+    const bool repetido = std::any_of(
+      vizinhanca.begin(),
+      vizinhanca.end(),
+      [&cone](const TConeVizinhanca& outro) { return MesmoCone(cone, outro); }
+    );
+
+    if (!repetido) {
+      vizinhanca.push_back(cone);
+    }
+  }
+
+  //--------------------------------------------------------------------------------------------
+
+  // União regularizada de dois trechos ON: o trecho está no interior quando as vizinhanças,
+  // somadas, envolvem toda a aresta, como em duas faces encostadas com normais opostas.
+  TSegmentoClassificado UneTrechosNaFronteira(
+    const TVizinhanca& esquerda,
+    const TVizinhanca& direita,
+    const TVetor3D& direcao
+  )
+  {
+    TSegmentoClassificado resultado = { 0.0, 0.0, EClassificacao::ON, esquerda };
+    for (const TConeVizinhanca& cone : direita) {
+      AcrescentaCone(resultado.vizinhanca, cone);
+    }
+
+    if (CobreTodasAsDirecoes(ArcosDaVizinhanca(resultado.vizinhanca, direcao))) {
+      return { 0.0, 0.0, EClassificacao::IN };
+    }
+
+    return resultado;
+  }
+
+  //--------------------------------------------------------------------------------------------
+
+  // Interseção regularizada de dois trechos ON: a vizinhança é a interseção dos cones, dois a dois.
+  // A interseção de dois cones junta as suas normais. Se nenhum cone resultante tem abertura, como
+  // em duas faces encostadas com normais opostas, o trecho está fora.
+  TSegmentoClassificado IntersectaTrechosNaFronteira(
+    const TVizinhanca& esquerda,
+    const TVizinhanca& direita,
+    const TVetor3D& direcao
+  )
+  {
+    TSegmentoClassificado resultado = { 0.0, 0.0, EClassificacao::ON };
+    for (const TConeVizinhanca& coneEsquerda : esquerda) {
+      for (const TConeVizinhanca& coneDireita : direita) {
+        TConeVizinhanca cone = coneEsquerda;
+        for (const TVetor3D& normal : coneDireita) {
+          const bool repetida = std::any_of(cone.begin(), cone.end(), [&normal](const TVetor3D& outra) {
+            return Norma(normal - outra) <= TOLERANCIA_GEOMETRICA;
+          });
+          if (!repetida) {
+            cone.push_back(normal);
+          }
+        }
+
+        if (!ArcosDaVizinhanca({ cone }, direcao).empty()) {
+          AcrescentaCone(resultado.vizinhanca, cone);
+        }
+      }
+    }
+
+    if (resultado.vizinhanca.empty()) {
+      return { 0.0, 0.0, EClassificacao::OUT };
+    }
+
+    return resultado;
+  }
+
+  //--------------------------------------------------------------------------------------------
+
+  // Combina dois trechos de mesmo intervalo. Um trecho ON de um só lado leva a vizinhança desse
+  // lado; ON dos dois lados é decidido pela vizinhança, conforme a operação.
   TSegmentoClassificado CombinaTrechos(
     EOperacaoBooleana operacao,
     const TSegmentoClassificado& esquerda,
@@ -278,24 +374,11 @@ namespace
       return resultado;
     }
 
-    // União das vizinhanças, sem repetir cones iguais, como os de faces coplanares do mesmo lado.
-    resultado.vizinhanca = esquerda.vizinhanca;
-    for (const TConeVizinhanca& cone : direita.vizinhanca) {
-      const bool repetido = std::any_of(
-        resultado.vizinhanca.begin(),
-        resultado.vizinhanca.end(),
-        [&cone](const TConeVizinhanca& outro) { return MesmoCone(cone, outro); }
-      );
-      if (!repetido) {
-        resultado.vizinhanca.push_back(cone);
-      }
+    if (operacao == EOperacaoBooleana::UNIAO) {
+      return UneTrechosNaFronteira(esquerda.vizinhanca, direita.vizinhanca, direcao);
     }
 
-    if (CobreTodasAsDirecoes(ArcosDaVizinhanca(resultado.vizinhanca, direcao))) {
-      return { 0.0, 0.0, EClassificacao::IN };
-    }
-
-    return resultado;
+    return IntersectaTrechosNaFronteira(esquerda.vizinhanca, direita.vizinhanca, direcao);
   }
 
   //--------------------------------------------------------------------------------------------
@@ -331,6 +414,8 @@ EClassificacao CombinaClassificacoes(
       return Uniao(esquerda, direita);
 
     case EOperacaoBooleana::INTERSECAO:
+      return Intersecao(esquerda, direita);
+
     case EOperacaoBooleana::DIFERENCA:
       throw std::logic_error("Operação booleana ainda não implementada");
   }

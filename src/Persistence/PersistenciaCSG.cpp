@@ -10,6 +10,7 @@
 #include <stdexcept>
 
 #include "Core/Bloco.h"
+#include "Core/Cilindro.h"
 #include "Core/Esfera.h"
 
 namespace
@@ -124,6 +125,10 @@ namespace
       return FormataNumero(esfera->Raio());
     }
 
+    if (const auto* cilindro = dynamic_cast<const TCilindro*>(&primitiva)) {
+      return FormataNumero(cilindro->Raio()) + "," + FormataNumero(cilindro->Altura());
+    }
+
     throw std::invalid_argument("Primitiva sem suporte no arquivo");
   }
 
@@ -144,6 +149,11 @@ namespace
     if (codigo == static_cast<char>(ETipoPrimitiva::ESFERA)) {
       const std::vector<double> raio = LeValoresDoCampo(campoParametros, 1);
       return CriaPrimitiva(std::make_shared<TEsfera>(raio[0]));
+    }
+
+    if (codigo == static_cast<char>(ETipoPrimitiva::CILINDRO)) {
+      const std::vector<double> raioEAltura = LeValoresDoCampo(campoParametros, 2);
+      return CriaPrimitiva(std::make_shared<TCilindro>(raioEAltura[0], raioEAltura[1]));
     }
 
     throw std::invalid_argument(std::string("Primitiva sem suporte: ") + codigo);

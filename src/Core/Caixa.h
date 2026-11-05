@@ -39,4 +39,26 @@ inline TCaixa UneCaixas(
 
 //----------------------------------------------------------------------------------------------
 
+// Parte comum das duas caixas. Sem parte comum, a caixa se reduz a um ponto, com volume nulo.
+inline TCaixa IntersectaCaixas(
+  const TCaixa& a,
+  const TCaixa& b
+)
+{
+  const TVetor3D minimo = {
+    std::max(a.minimo.x, b.minimo.x), std::max(a.minimo.y, b.minimo.y), std::max(a.minimo.z, b.minimo.z)
+  };
+  const TVetor3D maximo = {
+    std::min(a.maximo.x, b.maximo.x), std::min(a.maximo.y, b.maximo.y), std::min(a.maximo.z, b.maximo.z)
+  };
+
+  if (maximo.x < minimo.x || maximo.y < minimo.y || maximo.z < minimo.z) {
+    return { minimo, minimo };
+  }
+
+  return { minimo, maximo };
+}
+
+//----------------------------------------------------------------------------------------------
+
 #endif

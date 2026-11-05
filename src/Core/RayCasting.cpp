@@ -79,14 +79,24 @@ TVetor3D NormalNoPonto(
     }
 
     case ETipoNoCSG::OPERACAO_BOOLEANA: {
-      if (arvore->Operacao() != EOperacaoBooleana::UNIAO) {
-        throw std::logic_error("Operação booleana ainda não implementada");
-      }
+      const EClassificacao naEsquerda = ClassificaPonto(arvore->Esquerda(), ponto);
+      const EClassificacao naDireita = ClassificaPonto(arvore->Direita(), ponto);
 
-      // Na fronteira da união, o ponto está na fronteira de um filho e não no interior do outro.
-      const bool sobreEsquerda =
-        ClassificaPonto(arvore->Esquerda(), ponto) == EClassificacao::ON &&
-        ClassificaPonto(arvore->Direita(), ponto) != EClassificacao::IN;
+      // Na fronteira da união, o ponto está na fronteira de um filho e não no interior do outro;
+      // na da interseção, na fronteira de um filho e não fora do outro.
+      bool sobreEsquerda = false;
+      switch (arvore->Operacao()) {
+        case EOperacaoBooleana::UNIAO:
+          sobreEsquerda = naEsquerda == EClassificacao::ON && naDireita != EClassificacao::IN;
+          break;
+
+        case EOperacaoBooleana::INTERSECAO:
+          sobreEsquerda = naEsquerda == EClassificacao::ON && naDireita != EClassificacao::OUT;
+          break;
+
+        case EOperacaoBooleana::DIFERENCA:
+          throw std::logic_error("Operação booleana ainda não implementada");
+      }
 
       return NormalNoPonto(sobreEsquerda ? arvore->Esquerda() : arvore->Direita(), ponto);
     }

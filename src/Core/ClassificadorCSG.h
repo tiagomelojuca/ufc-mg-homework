@@ -13,8 +13,8 @@ EClassificacao CombinaClassificacoes(
   EClassificacao direita
 );
 
-// Combine_M regularizado: aplica a operação trecho a trecho e decide os trechos ON dos dois lados
-// pela vizinhança, em torno da aresta.
+// Combine_M regularizado da união e da interseção: aplica a operação trecho a trecho e decide os
+// trechos ON dos dois lados pela vizinhança, em torno da aresta.
 TClassificacaoAresta CombinaArestas(
   EOperacaoBooleana operacao,
   const TClassificacaoAresta& esquerda,

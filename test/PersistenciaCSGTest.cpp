@@ -6,6 +6,7 @@
 #include <string>
 
 #include "Core/Bloco.h"
+#include "Core/Cilindro.h"
 #include "Core/Esfera.h"
 #include "Persistence/PersistenciaCSG.h"
 
@@ -190,7 +191,7 @@ TEST(PersistenciaCSGTest, deve_rejeitar_arquivos_invalidos)
   EXPECT_THROW(persistencia.Decodifica("No1; U No2 No3"), std::invalid_argument);
   EXPECT_THROW(persistencia.Decodifica("No1; E; S 1\nNo1; E; S 2"), std::invalid_argument);
   EXPECT_THROW(persistencia.Decodifica("B; E; S 1"), std::invalid_argument);
-  EXPECT_THROW(persistencia.Decodifica("No1; C; S 1,2"), std::invalid_argument);
+  EXPECT_THROW(persistencia.Decodifica("No1; C; S 1"), std::invalid_argument);
 }
 
 //----------------------------------------------------------------------------------------------
@@ -233,6 +234,28 @@ TEST(PersistenciaCSGTest, deve_falhar_ao_carregar_arquivo_inexistente)
     TPersistenciaCSG().Carrega(std::filesystem::temp_directory_path() / "nao_existe_csg.txt"),
     std::runtime_error
   );
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(PersistenciaCSGTest, deve_ler_e_escrever_cilindro_e_intersecao)
+{
+  const std::string texto =
+    "No1; C; S 0.5,2; T 0,0,-1\n"
+    "No2; E; S 1\n"
+    "No3; I No1 No2\n";
+
+  const TPersistenciaCSG persistencia;
+  const TArvoreCSG raiz = persistencia.Decodifica(texto);
+
+  ASSERT_EQ(raiz->Tipo(), ETipoNoCSG::OPERACAO_BOOLEANA);
+  EXPECT_EQ(raiz->Operacao(), EOperacaoBooleana::INTERSECAO);
+
+  const auto& cilindro = dynamic_cast<const TCilindro&>(raiz->Esquerda()->Filho()->Primitiva());
+  EXPECT_DOUBLE_EQ(cilindro.Raio(), 0.5);
+  EXPECT_DOUBLE_EQ(cilindro.Altura(), 2.0);
+
+  EXPECT_EQ(persistencia.Codifica(raiz), texto);
 }
 
 //----------------------------------------------------------------------------------------------

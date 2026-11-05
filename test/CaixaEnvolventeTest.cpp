@@ -77,3 +77,19 @@ TEST(CaixaEnvolventeTest, deve_unir_as_caixas_na_uniao)
 }
 
 //----------------------------------------------------------------------------------------------
+
+TEST(CaixaEnvolventeTest, deve_intersectar_as_caixas_na_intersecao)
+{
+  const TArvoreCSG intersecao = CriaOperacaoBooleana(
+    EOperacaoBooleana::INTERSECAO,
+    CriaPrimitiva(std::make_shared<TBloco>(2.0, 2.0, 2.0)),
+    CriaMovimentoRigido(
+      TMovimentoRigido(ETipoMovimentoRigido::TRANSLACAO, { 1.0, 0.0, 0.0 }),
+      CriaPrimitiva(std::make_shared<TEsfera>(1.0))
+    )
+  );
+
+  EsperaCaixa(CaixaEnvolvente(intersecao), { { 0.0, -1.0, -1.0 }, { 1.0, 1.0, 1.0 } });
+}
+
+//----------------------------------------------------------------------------------------------

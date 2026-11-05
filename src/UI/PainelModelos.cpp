@@ -31,6 +31,7 @@ TPainelModelos::TPainelModelos() :
   tipoCriacao(ETipoCriacao::BLOCO),
   lados({ 2.0, 2.0, 2.0 }),
   raio(1.0),
+  altura(2.0),
   deslocamento({ 0.0, 0.0, 0.0 }),
   angulos({ 0.0, 0.0, 0.0 }),
   fatores({ 1.0, 1.0, 1.0 }),
@@ -142,19 +143,43 @@ void TPainelModelos::DesenhaCriacao(
   ImGui::RadioButton("Bloco", &tipo, static_cast<int>(ETipoCriacao::BLOCO));
   ImGui::SameLine();
   ImGui::RadioButton("Esfera", &tipo, static_cast<int>(ETipoCriacao::ESFERA));
+  ImGui::SameLine();
+  ImGui::RadioButton("Cilindro", &tipo, static_cast<int>(ETipoCriacao::CILINDRO));
   tipoCriacao = static_cast<ETipoCriacao>(tipo);
 
-  if (tipoCriacao == ETipoCriacao::BLOCO) {
-    CampoTriplo("Lados x, y, z", lados);
-  } else {
-    ImGui::InputDouble("Raio", &raio, 0.0, 0.0, "%.3f");
+  switch (tipoCriacao) {
+    case ETipoCriacao::BLOCO:
+      CampoTriplo("Lados x, y, z", lados);
+      break;
+
+    case ETipoCriacao::ESFERA:
+      ImGui::InputDouble("Raio", &raio, 0.0, 0.0, "%.3f");
+      break;
+
+    // Eixo z, com a base em z = 0.
+    case ETipoCriacao::CILINDRO:
+      ImGui::InputDouble("Raio", &raio, 0.0, 0.0, "%.3f");
+      ImGui::InputDouble("Altura", &altura, 0.0, 0.0, "%.3f");
+      break;
   }
 
   if (ImGui::Button("Criar")) {
     Executa([&]() {
-      const TIdModelo id = tipoCriacao == ETipoCriacao::BLOCO
-        ? modelador.CriaBloco(lados[0], lados[1], lados[2])
-        : modelador.CriaEsfera(raio);
+      TIdModelo id = 0;
+      switch (tipoCriacao) {
+        case ETipoCriacao::BLOCO:
+          id = modelador.CriaBloco(lados[0], lados[1], lados[2]);
+          break;
+
+        case ETipoCriacao::ESFERA:
+          id = modelador.CriaEsfera(raio);
+          break;
+
+        case ETipoCriacao::CILINDRO:
+          id = modelador.CriaCilindro(raio, altura);
+          break;
+      }
+
       selecionado = id;
       return "Criado " + modelador.Modelo(id).nome;
     });
@@ -180,7 +205,7 @@ void TPainelModelos::DesenhaOperacoes(
     });
   };
 
-  // União com outro modelo da lista.
+  // União e interseção com outro modelo da lista.
   if (segundoOperando && !modelador.Existe(*segundoOperando)) {
     segundoOperando.reset();
   }
@@ -200,6 +225,10 @@ void TPainelModelos::DesenhaOperacoes(
   ImGui::BeginDisabled(!segundoOperando);
   if (ImGui::Button("Unir")) {
     opera([&]() { return modelador.Une(atual, *segundoOperando); });
+  }
+  ImGui::SameLine();
+  if (ImGui::Button("Intersectar")) {
+    opera([&]() { return modelador.Intersecta(atual, *segundoOperando); });
   }
   ImGui::EndDisabled();
 

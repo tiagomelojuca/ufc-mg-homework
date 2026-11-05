@@ -42,7 +42,17 @@ class TModelador
       double raio
     );
 
+    TIdModelo CriaCilindro(
+      double raio,
+      double altura
+    );
+
     TIdModelo Une(
+      TIdModelo esquerda,
+      TIdModelo direita
+    );
+
+    TIdModelo Intersecta(
       TIdModelo esquerda,
       TIdModelo direita
     );

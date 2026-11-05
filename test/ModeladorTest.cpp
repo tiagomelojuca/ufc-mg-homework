@@ -171,3 +171,21 @@ TEST(ModeladorTest, deve_falhar_ao_carregar_arquivo_inexistente)
 }
 
 //----------------------------------------------------------------------------------------------
+
+TEST(ModeladorTest, deve_criar_cilindro_e_intersectar_modelos)
+{
+  TModelador modelador;
+  const TIdModelo cilindro = modelador.CriaCilindro(1.0, 2.0);
+  const TIdModelo bloco = modelador.CriaBloco(4.0, 4.0, 1.0);
+
+  const TIdModelo intersecao = modelador.Intersecta(cilindro, bloco);
+
+  EXPECT_EQ(modelador.Modelo(cilindro).nome, "#1 Cilindro de raio 1 e altura 2");
+  EXPECT_EQ(modelador.Modelo(intersecao).nome, "#3 Interseção de #1 e #2");
+
+  // O bloco corta o cilindro em z de 0 a 0,5: sobra um disco de raio 1 e altura 0,5.
+  EXPECT_NEAR(modelador.Volume(cilindro, 6), 2.0 * PI, 0.1);
+  EXPECT_NEAR(modelador.Volume(intersecao, 6), 0.5 * PI, 0.05);
+}
+
+//----------------------------------------------------------------------------------------------

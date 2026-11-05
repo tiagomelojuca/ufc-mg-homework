@@ -314,3 +314,106 @@ TEST(ClassificadorCSGTest,
 }
 
 //----------------------------------------------------------------------------------------------
+
+TEST(ClassificadorCSGTest, deve_seguir_a_tabela_da_intersecao_para_pontos) {
+  const EClassificacao IN = EClassificacao::IN;
+  const EClassificacao ON = EClassificacao::ON;
+  const EClassificacao OUT = EClassificacao::OUT;
+
+  const auto intersecao = [](EClassificacao a, EClassificacao b) {
+    return CombinaClassificacoes(EOperacaoBooleana::INTERSECAO, a, b);
+  };
+
+  EXPECT_EQ(intersecao(IN, IN), IN);
+  EXPECT_EQ(intersecao(IN, ON), ON);
+  EXPECT_EQ(intersecao(IN, OUT), OUT);
+  EXPECT_EQ(intersecao(ON, IN), ON);
+  EXPECT_EQ(intersecao(ON, ON), ON);
+  EXPECT_EQ(intersecao(ON, OUT), OUT);
+  EXPECT_EQ(intersecao(OUT, IN), OUT);
+  EXPECT_EQ(intersecao(OUT, ON), OUT);
+  EXPECT_EQ(intersecao(OUT, OUT), OUT);
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(ClassificadorCSGTest, deve_manter_apenas_a_parte_comum_na_intersecao) {
+  // O bloco ocupa x em [-1, 1] e a esfera, x em [0, 2]: a parte comum é [0, 1].
+  const TArvoreCSG intersecao = CriaOperacaoBooleana(
+      EOperacaoBooleana::INTERSECAO, CriaBloco(2.0),
+      Transladada(CriaEsfera(1.0), {1.0, 0.0, 0.0}));
+
+  const TClassificacaoAresta resultado =
+      ClassificaAresta(intersecao, TAresta({-3.0, 0.0, 0.0}, {3.0, 0.0, 0.0}));
+
+  EsperaTrechos(resultado, {{0.0, 3.0 / 6.0, EClassificacao::OUT},
+                            {3.0 / 6.0, 4.0 / 6.0, EClassificacao::IN},
+                            {4.0 / 6.0, 1.0, EClassificacao::OUT}});
+  EXPECT_EQ(ClassificaPonto(intersecao, {0.5, 0.0, 0.0}), EClassificacao::IN);
+  EXPECT_EQ(ClassificaPonto(intersecao, {-0.5, 0.0, 0.0}), EClassificacao::OUT);
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(ClassificadorCSGTest, deve_dar_fora_a_intersecao_de_solidos_disjuntos) {
+  const TArvoreCSG intersecao = CriaOperacaoBooleana(
+      EOperacaoBooleana::INTERSECAO, CriaBloco(2.0),
+      Transladada(CriaEsfera(1.0), {5.0, 0.0, 0.0}));
+
+  EsperaTrechos(
+      ClassificaAresta(intersecao, TAresta({-3.0, 0.0, 0.0}, {7.0, 0.0, 0.0})),
+      {{0.0, 1.0, EClassificacao::OUT}});
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(ClassificadorCSGTest,
+     deve_levar_para_fora_a_face_comum_de_blocos_encostados_na_intersecao) {
+  // As faces x = 1 se tocam com normais opostas: a interseção regularizada é
+  // vazia.
+  const TArvoreCSG intersecao = CriaOperacaoBooleana(
+      EOperacaoBooleana::INTERSECAO, CriaBloco(2.0),
+      Transladada(CriaBloco(2.0), {2.0, 0.0, 0.0}));
+
+  EsperaTrechos(
+      ClassificaAresta(intersecao, TAresta({1.0, -3.0, 0.0}, {1.0, 3.0, 0.0})),
+      {{0.0, 1.0, EClassificacao::OUT}});
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(ClassificadorCSGTest,
+     deve_manter_na_fronteira_faces_do_mesmo_lado_na_intersecao) {
+  // As faces y = 1 se sobrepõem com a mesma normal; a interseção ocupa x em
+  // [0, 1].
+  const TArvoreCSG intersecao = CriaOperacaoBooleana(
+      EOperacaoBooleana::INTERSECAO, CriaBloco(2.0),
+      Transladada(CriaBloco(2.0), {1.0, 0.0, 0.0}));
+
+  const TClassificacaoAresta resultado =
+      ClassificaAresta(intersecao, TAresta({-3.0, 1.0, 0.0}, {3.0, 1.0, 0.0}));
+
+  EsperaTrechos(resultado, {{0.0, 3.0 / 6.0, EClassificacao::OUT},
+                            {3.0 / 6.0, 4.0 / 6.0, EClassificacao::ON},
+                            {4.0 / 6.0, 1.0, EClassificacao::OUT}});
+  EXPECT_EQ(resultado[1].vizinhanca.size(), 1u);
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(ClassificadorCSGTest,
+     deve_manter_na_fronteira_a_aresta_comum_de_faces_perpendiculares) {
+  // A reta x = y = 1 é lado dos dois blocos; na interseção, as duas
+  // vizinhanças de 90 graus coincidem e o trecho continua na fronteira.
+  const TArvoreCSG intersecao = CriaOperacaoBooleana(
+      EOperacaoBooleana::INTERSECAO, CriaBloco(2.0),
+      Transladada(CriaBloco(2.0, 2.0, 4.0), {0.0, 0.0, 1.0}));
+
+  EsperaTrechos(
+      ClassificaAresta(intersecao, TAresta({1.0, 1.0, -3.0}, {1.0, 1.0, 3.0})),
+      {{0.0, 1.0 / 3.0, EClassificacao::OUT},
+       {1.0 / 3.0, 2.0 / 3.0, EClassificacao::ON},
+       {2.0 / 3.0, 1.0, EClassificacao::OUT}});
+}
+
+//----------------------------------------------------------------------------------------------

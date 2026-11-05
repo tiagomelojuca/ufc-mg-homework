@@ -26,6 +26,10 @@ O nó de movimento rígido, exigido pela modelagem local, classifica a aresta tr
 
 A regularização usa a vizinhança dos segmentos ON. Cada segmento ON leva as normais exteriores das faces que o contêm: uma sobre uma face, duas sobre uma aresta do bloco. Nos nós de movimento rígido, as normais voltam ao sistema do pai pela transposta da inversa. Quando os dois lados de um trecho são ON, as vizinhanças são unidas no plano perpendicular à aresta. Se a união cobre todas as direções, como em faces encostadas com normais opostas, o trecho passa a IN; caso contrário continua ON com a vizinhança unida.
 
+Na interseção, as vizinhanças são intersectadas cone a cone: a interseção de dois cones junta as suas normais. Cones sem abertura são descartados; se nenhum resta, como em faces encostadas com normais opostas, o trecho passa a OUT. Caso contrário, continua ON com os cones que restaram.
+
+No cilindro, um trecho ON sobre uma base leva a normal `±z`; sobre a superfície lateral, a normal radial.
+
 O ray-casting usa a mesma recursão com uma aresta semi-infinita, o raio, e toma a primeira interseção. A cor resulta de um modelo de iluminação com normal, propriedades da superfície e posição da luz.
 
 O raio é representado por uma aresta finita que parte da câmera e passa de toda a cena, o que equivale à aresta semi-infinita para a primeira interseção. A interseção é o início do primeiro trecho não OUT; um raio que parte de dentro do sólido não gera interseção. A normal no ponto vem da primitiva cuja fronteira contém o ponto e volta ao sistema do pai pela transposta da inversa de cada movimento rígido. A iluminação segue o modelo de Phong, com termos ambiente, difuso e especular.

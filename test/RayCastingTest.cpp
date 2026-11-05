@@ -6,6 +6,7 @@
 
 #include "Core/ArvoreCSG.h"
 #include "Core/Bloco.h"
+#include "Core/Cilindro.h"
 #include "Core/Esfera.h"
 #include "Core/RayCasting.h"
 
@@ -326,6 +327,50 @@ TEST(RayCastingTest, deve_recortar_a_aresta_que_passa_por_tras_da_camera)
   ASSERT_TRUE(recortada.has_value());
   EsperaVetor(recortada->Inicio(), { 0.0, 1.0, 0.0 });
   EXPECT_NEAR(recortada->Fim().z, 5.0 - 1e-3, TOLERANCIA);
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(RayCastingTest, deve_dar_a_normal_do_topo_e_da_lateral_do_cilindro)
+{
+  const TArvoreCSG cilindro = CriaPrimitiva(std::make_shared<TCilindro>(1.0, 2.0));
+
+  const std::optional<TIntersecao> peloTopo =
+    PrimeiraIntersecao(cilindro, TAresta({ 0.2, 0.3, 10.0 }, { 0.2, 0.3, -10.0 }));
+  ASSERT_TRUE(peloTopo.has_value());
+  EsperaVetor(peloTopo->ponto, { 0.2, 0.3, 2.0 });
+  EsperaVetor(peloTopo->normal, { 0.0, 0.0, 1.0 });
+
+  const std::optional<TIntersecao> pelaLateral =
+    PrimeiraIntersecao(cilindro, TAresta({ 5.0, 0.0, 1.0 }, { -5.0, 0.0, 1.0 }));
+  ASSERT_TRUE(pelaLateral.has_value());
+  EsperaVetor(pelaLateral->ponto, { 1.0, 0.0, 1.0 });
+  EsperaVetor(pelaLateral->normal, { 1.0, 0.0, 0.0 });
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(RayCastingTest, deve_dar_a_normal_do_filho_que_limita_a_intersecao)
+{
+  // A esfera de raio 1,2 corta os cantos do bloco 2 x 2 x 2, mas não o centro das faces.
+  const TArvoreCSG intersecao = CriaOperacaoBooleana(
+    EOperacaoBooleana::INTERSECAO,
+    CriaBloco(2.0, 2.0, 2.0),
+    CriaEsfera(1.2)
+  );
+
+  const std::optional<TIntersecao> pelaFace =
+    PrimeiraIntersecao(intersecao, TAresta({ 5.0, 0.0, 0.0 }, { -5.0, 0.0, 0.0 }));
+  ASSERT_TRUE(pelaFace.has_value());
+  EsperaVetor(pelaFace->ponto, { 1.0, 0.0, 0.0 });
+  EsperaVetor(pelaFace->normal, { 1.0, 0.0, 0.0 });
+
+  const std::optional<TIntersecao> peloCanto =
+    PrimeiraIntersecao(intersecao, TAresta({ 5.0, 5.0, 5.0 }, { -5.0, -5.0, -5.0 }));
+  const double coordenada = 1.2 / std::sqrt(3.0);
+  ASSERT_TRUE(peloCanto.has_value());
+  EsperaVetor(peloCanto->ponto, { coordenada, coordenada, coordenada });
+  EsperaVetor(peloCanto->normal, Normaliza({ 1.0, 1.0, 1.0 }));
 }
 
 //----------------------------------------------------------------------------------------------
