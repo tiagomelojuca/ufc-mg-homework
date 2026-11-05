@@ -32,6 +32,8 @@ class TEsfera : public TPrimitiva
       const TVetor3D& fatores
     ) const override;
 
+    TCaixa CaixaCanonica() const override;
+
   private:
     double raio;
 };

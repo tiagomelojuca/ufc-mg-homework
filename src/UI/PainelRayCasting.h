@@ -8,16 +8,15 @@
 
 //----------------------------------------------------------------------------------------------
 
-// Painel que exibe a imagem da árvore gerada por ray-casting, com a câmera em órbita em torno da
-// origem, e as arestas classificadas pela SMC sobre ela. A imagem só é recalculada quando a árvore
-// ou a câmera mudam.
+// Painel que exibe a imagem da árvore gerada por ray-casting, com a câmera em órbita em torno do
+// centro do modelo, e as arestas classificadas pela SMC sobre ela. A imagem só é recalculada quando
+// a árvore ou a câmera mudam.
 class TPainelRayCasting
 {
   public:
-    explicit TPainelRayCasting(
-      TArvoreCSG arvore
-    );
+    TPainelRayCasting();
 
+    // Uma árvore vazia deixa o painel sem modelo. A câmera é reenquadrada no novo modelo.
     void DefineArvore(
       TArvoreCSG novaArvore
     );
@@ -31,6 +30,10 @@ class TPainelRayCasting
 
     TArvoreCSG arvore;
     TExibicaoSMC exibicaoSMC;
+
+    // Centro da caixa envolvente do modelo e metade da sua diagonal.
+    TVetor3D alvo;
+    double raioDaCena;
 
     float azimuteGraus;
     float elevacaoGraus;

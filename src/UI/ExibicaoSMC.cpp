@@ -3,6 +3,7 @@
 #include <optional>
 #include <utility>
 
+#include "Core/CaixaEnvolvente.h"
 #include "Core/ClassificadorCSG.h"
 
 namespace
@@ -82,16 +83,7 @@ namespace
 
 //----------------------------------------------------------------------------------------------
 
-TExibicaoSMC::TExibicaoSMC(
-  TArvoreCSG arvore
-) :
-  arvore(std::move(arvore)),
-  arestas({
-    { { -4.0f, 0.5f, 0.0f }, { 4.0f, 0.5f, 0.0f } },
-    { { 0.8f, -2.0f, 0.3f }, { 0.8f, 3.0f, 0.3f } },
-    { { -3.0f, -1.0f, -2.0f }, { 3.0f, 2.0f, 2.0f } },
-    { { -1.7321f, 0.75f, 1.0f }, { 1.7321f, 0.75f, -1.0f } }
-  }),
+TExibicaoSMC::TExibicaoSMC() :
   precisaClassificar(true),
   visivel(true)
 {
@@ -105,6 +97,25 @@ void TExibicaoSMC::DefineArvore(
 {
   arvore = std::move(novaArvore);
   precisaClassificar = true;
+  arestas.clear();
+
+  if (!arvore) {
+    return;
+  }
+
+  // Cada aresta atravessa a caixa do modelo e passa um quarto dela de cada lado.
+  const TCaixa caixa = CaixaEnvolvente(arvore);
+  const TVetor3D centro = Centro(caixa);
+  const TVetor3D minimo = caixa.minimo - 0.25 * (caixa.maximo - caixa.minimo);
+  const TVetor3D maximo = caixa.maximo + 0.25 * (caixa.maximo - caixa.minimo);
+
+  const auto ponto = [](double x, double y, double z) {
+    return std::array<float, 3> { static_cast<float>(x), static_cast<float>(y), static_cast<float>(z) };
+  };
+
+  arestas.push_back({ ponto(minimo.x, centro.y, centro.z), ponto(maximo.x, centro.y, centro.z) });
+  arestas.push_back({ ponto(centro.x, minimo.y, centro.z), ponto(centro.x, maximo.y, centro.z) });
+  arestas.push_back({ ponto(centro.x, centro.y, minimo.z), ponto(centro.x, centro.y, maximo.z) });
 }
 
 //----------------------------------------------------------------------------------------------

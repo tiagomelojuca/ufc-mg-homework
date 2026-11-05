@@ -51,6 +51,11 @@ namespace
         return std::make_shared<TPrimitivaTeste>(tipo);
       }
 
+      TCaixa CaixaCanonica() const override
+      {
+        return { { -1.0, -1.0, -1.0 }, { 1.0, 1.0, 1.0 } };
+      }
+
     private:
       ETipoPrimitiva tipo;
   };

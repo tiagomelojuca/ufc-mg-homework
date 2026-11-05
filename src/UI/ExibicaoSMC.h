@@ -16,10 +16,9 @@
 class TExibicaoSMC
 {
   public:
-    explicit TExibicaoSMC(
-      TArvoreCSG arvore
-    );
+    TExibicaoSMC();
 
+    // As arestas voltam às três paralelas aos eixos pelo centro do novo modelo.
     void DefineArvore(
       TArvoreCSG novaArvore
     );

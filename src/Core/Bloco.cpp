@@ -187,3 +187,11 @@ std::shared_ptr<const TPrimitiva> TBloco::Escalada(
 }
 
 //----------------------------------------------------------------------------------------------
+
+TCaixa TBloco::CaixaCanonica() const
+{
+  const TVetor3D meiosLados = { ladoX / 2.0, ladoY / 2.0, ladoZ / 2.0 };
+  return { -1.0 * meiosLados, meiosLados };
+}
+
+//----------------------------------------------------------------------------------------------

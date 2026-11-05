@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include "Caixa.h"
 #include "Classificacao.h"
 #include "Vetor3D.h"
 
@@ -44,6 +45,9 @@ class TPrimitiva
     virtual std::shared_ptr<const TPrimitiva> Escalada(
       const TVetor3D& fatores
     ) const = 0;
+
+    // Caixa alinhada aos eixos que contém a primitiva em posição canônica.
+    virtual TCaixa CaixaCanonica() const = 0;
 
   protected:
     static void ExigeDimensaoPositiva(

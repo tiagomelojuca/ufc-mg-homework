@@ -13,7 +13,8 @@ Calculamos o volume convertendo a árvore CSG em octree:
 
 - cada célula é classificada pelo seu centro;
 - a classificação do ponto consulta a árvore CSG, com a mesma recursão da SMC;
-- o volume é a soma dos volumes das folhas cheias.
+- o volume é a soma dos volumes das folhas cheias;
+- a raiz da octree é a caixa envolvente da árvore, alinhada aos eixos.
 
 A profundidade da octree controla a precisão da aproximação.
 
