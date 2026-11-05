@@ -24,6 +24,10 @@ class TEsfera : public TPrimitiva
       const TAresta& aresta
     ) const override;
 
+    TVetor3D Normal(
+      const TVetor3D& ponto
+    ) const override;
+
   private:
     double raio;
 };

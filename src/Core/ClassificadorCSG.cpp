@@ -300,8 +300,7 @@ namespace
 
   //--------------------------------------------------------------------------------------------
 
-  // Leva as normais das vizinhanças do sistema do filho ao do pai. Normais se transformam pela
-  // transposta da inversa da matriz que leva pontos do filho ao pai.
+  // Leva as normais das vizinhanças do sistema do filho ao do pai.
   TClassificacaoAresta LevaVizinhancasAoSistemaDoPai(
     TClassificacaoAresta classificacao,
     const TMatriz4x4& inversa
@@ -310,16 +309,7 @@ namespace
     for (TSegmentoClassificado& segmento : classificacao) {
       for (TConeVizinhanca& cone : segmento.vizinhanca) {
         for (TVetor3D& normal : cone) {
-          const double componentes[] = { normal.x, normal.y, normal.z };
-          double transformada[3] = { 0.0, 0.0, 0.0 };
-          for (int i = 0; i < 3; ++i) {
-            for (int j = 0; j < 3; ++j) {
-              transformada[i] += inversa.Elemento(j, i) * componentes[j];
-            }
-          }
-
-          const TVetor3D resultado = { transformada[0], transformada[1], transformada[2] };
-          normal = (1.0 / Norma(resultado)) * resultado;
+          normal = Normaliza(inversa.TransformaNormalPelaTransposta(normal));
         }
       }
     }

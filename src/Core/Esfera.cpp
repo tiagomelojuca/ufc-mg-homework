@@ -68,3 +68,12 @@ TClassificacaoAresta TEsfera::ClassificaAresta(
 }
 
 //----------------------------------------------------------------------------------------------
+
+TVetor3D TEsfera::Normal(
+  const TVetor3D& ponto
+) const
+{
+  return Normaliza(ponto);
+}
+
+//----------------------------------------------------------------------------------------------

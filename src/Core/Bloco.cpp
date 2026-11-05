@@ -152,3 +152,27 @@ TClassificacaoAresta TBloco::ClassificaAresta(
 }
 
 //----------------------------------------------------------------------------------------------
+
+TVetor3D TBloco::Normal(
+  const TVetor3D& ponto
+) const
+{
+  // A face do ponto é a do eixo em que ele mais se aproxima do plano (ou mais o excede).
+  const double excessos[] = {
+    std::abs(ponto.x) - ladoX / 2.0,
+    std::abs(ponto.y) - ladoY / 2.0,
+    std::abs(ponto.z) - ladoZ / 2.0
+  };
+
+  if (excessos[0] >= excessos[1] && excessos[0] >= excessos[2]) {
+    return { ponto.x >= 0.0 ? 1.0 : -1.0, 0.0, 0.0 };
+  }
+
+  if (excessos[1] >= excessos[2]) {
+    return { 0.0, ponto.y >= 0.0 ? 1.0 : -1.0, 0.0 };
+  }
+
+  return { 0.0, 0.0, ponto.z >= 0.0 ? 1.0 : -1.0 };
+}
+
+//----------------------------------------------------------------------------------------------

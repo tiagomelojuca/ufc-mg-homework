@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H_
 #define MAINWINDOW_H_
 
+#include "PainelRayCasting.h"
 #include "Window.h"
 
 //----------------------------------------------------------------------------------------------
@@ -30,6 +31,9 @@ class TEstrategiaProcessamentoMainWindow : public TWindow::TEstrategiaProcessame
     std::unique_ptr<TEstrategiaProcessamento> Copia() const override;
 
     void Executa() override;
+
+  private:
+    TPainelRayCasting painelRayCasting;
 };
 
 //----------------------------------------------------------------------------------------------

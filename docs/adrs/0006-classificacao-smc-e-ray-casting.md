@@ -28,6 +28,8 @@ A regularização usa a vizinhança dos segmentos ON. Cada segmento ON leva as n
 
 O ray-casting usa a mesma recursão com uma aresta semi-infinita, o raio, e toma a primeira interseção. A cor resulta de um modelo de iluminação com normal, propriedades da superfície e posição da luz.
 
+O raio é representado por uma aresta finita que parte da câmera e passa de toda a cena, o que equivale à aresta semi-infinita para a primeira interseção. A interseção é o início do primeiro trecho não OUT; um raio que parte de dentro do sólido não gera interseção. A normal no ponto vem da primitiva cuja fronteira contém o ponto e volta ao sistema do pai pela transposta da inversa de cada movimento ou escala. A iluminação segue o modelo de Phong, com termos ambiente, difuso e especular.
+
 A exibição da SMC classifica arestas finitas contra a árvore e desenha cada parte com a cor de IN, ON ou OUT.
 
 ## Consequências

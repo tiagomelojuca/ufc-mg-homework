@@ -46,6 +46,12 @@ class TMatriz4x4
       const TVetor3D& ponto
     ) const;
 
+    // Normais se transformam pela transposta da inversa da matriz dos pontos. Chamada na inversa
+    // de um movimento, leva a normal pelo próprio movimento; o resultado não é normalizado.
+    TVetor3D TransformaNormalPelaTransposta(
+      const TVetor3D& normal
+    ) const;
+
   private:
     std::array<std::array<double, 4>, 4> elementos;
 };

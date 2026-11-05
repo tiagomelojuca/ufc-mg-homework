@@ -1,5 +1,29 @@
 #include "MainWindow.h"
 
+#include <memory>
+
+#include "Core/Bloco.h"
+#include "Core/Esfera.h"
+
+namespace
+{
+  // Cena exibida enquanto a interface ainda não cria modelos: um bloco girado unido a uma esfera.
+  TArvoreCSG CriaCenaDeExemplo()
+  {
+    const TArvoreCSG bloco = CriaMovimentoRigido(
+      TMovimentoRigido(ETipoMovimentoRigido::ROTACAO, { 0.0, 30.0, 0.0 }),
+      CriaPrimitiva(std::make_shared<TBloco>(3.0, 1.5, 2.0))
+    );
+
+    const TArvoreCSG esfera = CriaMovimentoRigido(
+      TMovimentoRigido(ETipoMovimentoRigido::TRANSLACAO, { 0.8, 0.9, 0.3 }),
+      CriaPrimitiva(std::make_shared<TEsfera>(1.0))
+    );
+
+    return CriaOperacaoBooleana(EOperacaoBooleana::UNIAO, bloco, esfera);
+  }
+}
+
 //----------------------------------------------------------------------------------------------
 // Class TGanchoImGuiMainWindow
 //----------------------------------------------------------------------------------------------
@@ -49,7 +73,8 @@ void TGanchoImGuiMainWindow::Limpa()
 TEstrategiaProcessamentoMainWindow::TEstrategiaProcessamentoMainWindow(
   TWindow& wnd
 ) :
-  TWindow::TEstrategiaProcessamento(wnd)
+  TWindow::TEstrategiaProcessamento(wnd),
+  painelRayCasting(CriaCenaDeExemplo())
 {
 }
 
@@ -72,6 +97,8 @@ void TEstrategiaProcessamentoMainWindow::Executa()
 
   ImGui::Begin("Modelador CSG");
   ImGui::End();
+
+  painelRayCasting.Desenha();
 
   ImGui::Render();
 

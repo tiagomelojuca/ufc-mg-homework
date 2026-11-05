@@ -37,6 +37,13 @@ namespace
         return { { 0.0, 1.0, EClassificacao::OUT } };
       }
 
+      TVetor3D Normal(
+        const TVetor3D&
+      ) const override
+      {
+        return { 0.0, 0.0, 1.0 };
+      }
+
     private:
       ETipoPrimitiva tipo;
   };

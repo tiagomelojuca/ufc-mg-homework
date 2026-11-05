@@ -148,6 +148,24 @@ TVetor3D TMatriz4x4::TransformaPonto(
 
   return { resultado[0], resultado[1], resultado[2] };
 }
+
+//----------------------------------------------------------------------------------------------
+
+TVetor3D TMatriz4x4::TransformaNormalPelaTransposta(
+  const TVetor3D& normal
+) const
+{
+  const double componentes[3] = { normal.x, normal.y, normal.z };
+  double resultado[3] = { 0.0, 0.0, 0.0 };
+
+  for (int i = 0; i < 3; ++i) {
+    for (int k = 0; k < 3; ++k) {
+      resultado[i] += elementos[k][i] * componentes[k];
+    }
+  }
+
+  return { resultado[0], resultado[1], resultado[2] };
+}
 TMatriz4x4 TMatriz4x4::Escala(
   const TVetor3D& fatores
 )

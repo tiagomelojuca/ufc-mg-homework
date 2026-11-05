@@ -32,6 +32,11 @@ class TPrimitiva
       const TAresta& aresta
     ) const = 0;
 
+    // Normal exterior unitária da fronteira no ponto, que deve estar sobre a primitiva.
+    virtual TVetor3D Normal(
+      const TVetor3D& ponto
+    ) const = 0;
+
   protected:
     static void ExigeDimensaoPositiva(
       double valor,
