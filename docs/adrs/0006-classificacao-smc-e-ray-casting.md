@@ -38,6 +38,8 @@ A exibição da SMC classifica arestas finitas contra a árvore e desenha cada p
 
 As arestas são projetadas com a mesma câmera do ray-casting e desenhadas sobre a imagem, sem ocultação pelo sólido, para que as partes IN fiquem visíveis. IN é verde, ON é amarelo e OUT é vermelho. A parte de uma aresta atrás da câmera é recortada antes da projeção.
 
+O aramado mostra os segmentos `EonS`: as arestas do contorno de cada primitiva, levadas ao sistema da raiz pelos movimentos rígidos e classificadas contra a árvore inteira, das quais se mantêm as partes ON. Bloco e cilindro fornecem as suas arestas; a esfera, que não tem arestas, é representada por meridianos e paralelos, e o cilindro também por geratrizes. Uma curva é aproximada por cordas, que passam por dentro da primitiva; por isso a corda é mantida quando o ponto da curva no meio dela é ON, em vez de ser classificada como aresta. O aramado não remove linhas ocultas.
+
 ## Consequências
 
 - Ray-casting e exibição da SMC compartilham `Prim_M` e `Combine_M`.

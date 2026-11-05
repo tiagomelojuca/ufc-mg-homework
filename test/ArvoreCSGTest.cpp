@@ -56,6 +56,11 @@ namespace
         return { { -1.0, -1.0, -1.0 }, { 1.0, 1.0, 1.0 } };
       }
 
+      std::vector<TArestaCandidata> ArestasDoContorno() const override
+      {
+        return {};
+      }
+
     private:
       ETipoPrimitiva tipo;
   };

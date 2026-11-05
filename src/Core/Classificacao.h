@@ -1,6 +1,7 @@
 #ifndef CLASSIFICACAO_H_
 #define CLASSIFICACAO_H_
 
+#include <optional>
 #include <vector>
 
 #include "Vetor3D.h"
@@ -50,6 +51,17 @@ class TAresta
 // que contêm o trecho; a vizinhança é a união dos cones.
 using TConeVizinhanca = std::vector<TVetor3D>;
 using TVizinhanca = std::vector<TConeVizinhanca>;
+
+//----------------------------------------------------------------------------------------------
+
+// Aresta do contorno de uma primitiva, candidata ao aramado. Uma curva é aproximada por cordas, que
+// passam por dentro do sólido; pontoDaCurva é o ponto da curva no meio da corda, este sim sobre a
+// fronteira. Arestas retas não têm esse ponto.
+struct TArestaCandidata
+{
+  TAresta aresta;
+  std::optional<TVetor3D> pontoDaCurva;
+};
 
 //----------------------------------------------------------------------------------------------
 

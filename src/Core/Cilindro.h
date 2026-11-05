@@ -39,6 +39,8 @@ class TCilindro : public TPrimitiva
 
     TCaixa CaixaCanonica() const override;
 
+    std::vector<TArestaCandidata> ArestasDoContorno() const override;
+
   private:
     double raio;
     double altura;

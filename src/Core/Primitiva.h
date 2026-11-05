@@ -49,6 +49,10 @@ class TPrimitiva
     // Caixa alinhada aos eixos que contém a primitiva em posição canônica.
     virtual TCaixa CaixaCanonica() const = 0;
 
+    // Arestas do contorno em posição canônica, para o aramado. Superfícies curvas sem arestas
+    // próprias, como a esfera, são representadas por meridianos e paralelos.
+    virtual std::vector<TArestaCandidata> ArestasDoContorno() const = 0;
+
   protected:
     static void ExigeDimensaoPositiva(
       double valor,
@@ -57,6 +61,15 @@ class TPrimitiva
 
     static void ExigeFatoresDeEscala(
       const TVetor3D& fatores
+    );
+
+    // Acrescenta o círculo centro + raio (cos θ u + sen θ v), aproximado por cordas.
+    static void AcrescentaCirculo(
+      std::vector<TArestaCandidata>& arestas,
+      const TVetor3D& centro,
+      const TVetor3D& u,
+      const TVetor3D& v,
+      double raio
     );
 
     // Converte a distância com sinal à fronteira (negativa dentro) em IN, ON ou OUT.

@@ -230,3 +230,25 @@ TCaixa TCilindro::CaixaCanonica() const
 }
 
 //----------------------------------------------------------------------------------------------
+
+std::vector<TArestaCandidata> TCilindro::ArestasDoContorno() const
+{
+  constexpr double PI = 3.14159265358979323846;
+  std::vector<TArestaCandidata> arestas;
+
+  // As bordas das bases são as arestas próprias do cilindro.
+  AcrescentaCirculo(arestas, { 0.0, 0.0, 0.0 }, { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, raio);
+  AcrescentaCirculo(arestas, { 0.0, 0.0, altura }, { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, raio);
+
+  // Oito geratrizes retas, a cada 45 graus, desenham a superfície lateral.
+  for (int i = 0; i < 8; ++i) {
+    const double angulo = PI * i / 4.0;
+    const double x = raio * std::cos(angulo);
+    const double y = raio * std::sin(angulo);
+    arestas.push_back({ TAresta({ x, y, 0.0 }, { x, y, altura }), std::nullopt });
+  }
+
+  return arestas;
+}
+
+//----------------------------------------------------------------------------------------------

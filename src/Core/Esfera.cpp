@@ -101,3 +101,37 @@ TCaixa TEsfera::CaixaCanonica() const
 }
 
 //----------------------------------------------------------------------------------------------
+
+std::vector<TArestaCandidata> TEsfera::ArestasDoContorno() const
+{
+  constexpr double PI = 3.14159265358979323846;
+  std::vector<TArestaCandidata> arestas;
+
+  // Seis meridianos, a cada 30 graus em torno do eixo z.
+  for (int i = 0; i < 6; ++i) {
+    const double angulo = PI * i / 6.0;
+    AcrescentaCirculo(
+      arestas,
+      { 0.0, 0.0, 0.0 },
+      { std::cos(angulo), std::sin(angulo), 0.0 },
+      { 0.0, 0.0, 1.0 },
+      raio
+    );
+  }
+
+  // Paralelos nas latitudes de -60 a 60 graus.
+  for (int latitude = -60; latitude <= 60; latitude += 30) {
+    const double angulo = latitude * PI / 180.0;
+    AcrescentaCirculo(
+      arestas,
+      { 0.0, 0.0, raio * std::sin(angulo) },
+      { 1.0, 0.0, 0.0 },
+      { 0.0, 1.0, 0.0 },
+      raio * std::cos(angulo)
+    );
+  }
+
+  return arestas;
+}
+
+//----------------------------------------------------------------------------------------------

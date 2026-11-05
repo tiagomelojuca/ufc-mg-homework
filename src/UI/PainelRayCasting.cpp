@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <utility>
 
+#include "Core/Aramado.h"
 #include "Core/CaixaEnvolvente.h"
 
 namespace
@@ -14,6 +15,7 @@ namespace
 //----------------------------------------------------------------------------------------------
 
 TPainelRayCasting::TPainelRayCasting() :
+  modo(EModoExibicao::RAY_CASTING),
   alvo({ 0.0, 0.0, 0.0 }),
   raioDaCena(1.0),
   azimuteGraus(35.0f),
@@ -35,8 +37,11 @@ void TPainelRayCasting::DefineArvore(
   arvore = std::move(novaArvore);
   exibicaoSMC.DefineArvore(arvore);
   precisaRenderizar = true;
+  aramado.clear();
 
   if (arvore) {
+    aramado = SegmentosEonS(arvore);
+
     const TCaixa caixa = CaixaEnvolvente(arvore);
     alvo = Centro(caixa);
     raioDaCena = 0.5 * Norma(caixa.maximo - caixa.minimo);
@@ -58,6 +63,12 @@ void TPainelRayCasting::Desenha()
     return;
   }
 
+  int modoEscolhido = static_cast<int>(modo);
+  ImGui::RadioButton("Ray-casting", &modoEscolhido, static_cast<int>(EModoExibicao::RAY_CASTING));
+  ImGui::SameLine();
+  ImGui::RadioButton("Aramado (EonS)", &modoEscolhido, static_cast<int>(EModoExibicao::ARAMADO));
+  modo = static_cast<EModoExibicao>(modoEscolhido);
+
   // Cada controle alterado pede uma nova imagem.
   precisaRenderizar |= ImGui::SliderFloat("Azimute", &azimuteGraus, -180.0f, 180.0f, "%.0f°");
   precisaRenderizar |= ImGui::SliderFloat("Elevação", &elevacaoGraus, -89.0f, 89.0f, "%.0f°");
@@ -70,16 +81,27 @@ void TPainelRayCasting::Desenha()
     ImGuiSliderFlags_Logarithmic
   );
 
-  if (precisaRenderizar) {
-    AtualizaTextura();
-    precisaRenderizar = false;
+  const TCamera camera = MontaCena().camera;
+  const ImVec2 tamanho(static_cast<float>(largura), static_cast<float>(altura));
+
+  if (modo == EModoExibicao::RAY_CASTING) {
+    if (precisaRenderizar) {
+      AtualizaTextura();
+      precisaRenderizar = false;
+    }
+
+    ImGui::Image(static_cast<ImTextureID>(static_cast<std::uintptr_t>(textura)), tamanho);
+  } else {
+    // Reserva a área da imagem e desenha o aramado nela.
+    ImGui::Dummy(tamanho);
+    DesenhaAramado(camera, ImGui::GetItemRectMin());
   }
 
-  ImGui::Image(
-    static_cast<ImTextureID>(static_cast<std::uintptr_t>(textura)),
-    ImVec2(static_cast<float>(largura), static_cast<float>(altura))
-  );
-  exibicaoSMC.DesenhaSobreImagem(MontaCena().camera, ImGui::GetItemRectMin(), largura, altura);
+  exibicaoSMC.DesenhaSobreImagem(camera, ImGui::GetItemRectMin(), largura, altura);
+
+  if (modo == EModoExibicao::ARAMADO) {
+    ImGui::Text("%zu segmentos EonS", aramado.size());
+  }
 
   exibicaoSMC.DesenhaControles();
 
@@ -137,6 +159,52 @@ void TPainelRayCasting::AtualizaTextura()
     GL_UNSIGNED_BYTE,
     imagem.pixels.data()
   );
+}
+
+//----------------------------------------------------------------------------------------------
+
+void TPainelRayCasting::DesenhaAramado(
+  const TCamera& camera,
+  const ImVec2& origem
+) const
+{
+  const ImVec2 fim(origem.x + largura, origem.y + altura);
+  const TVetor3D fundo = MontaCena().corDeFundo;
+
+  ImDrawList* desenho = ImGui::GetWindowDrawList();
+  desenho->PushClipRect(origem, fim, true);
+  desenho->AddRectFilled(
+    origem,
+    fim,
+    ImGui::ColorConvertFloat4ToU32(ImVec4(
+      static_cast<float>(fundo.x),
+      static_cast<float>(fundo.y),
+      static_cast<float>(fundo.z),
+      1.0f
+    ))
+  );
+
+  const auto naTela = [&](const TVetor3D& ponto) {
+    const TPontoImagem projetado = ProjetaPonto(camera, ponto, largura, altura);
+    return ImVec2(
+      origem.x + static_cast<float>(projetado.coluna),
+      origem.y + static_cast<float>(projetado.linha)
+    );
+  };
+
+  for (const TAresta& segmento : aramado) {
+    const std::optional<TAresta> visivel = RecortaAFrenteDaCamera(camera, segmento);
+    if (visivel) {
+      desenho->AddLine(
+        naTela(visivel->Inicio()),
+        naTela(visivel->Fim()),
+        IM_COL32(225, 225, 230, 255),
+        1.5f
+      );
+    }
+  }
+
+  desenho->PopClipRect();
 }
 
 //----------------------------------------------------------------------------------------------

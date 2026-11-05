@@ -30,6 +30,30 @@ void TPrimitiva::ExigeFatoresDeEscala(
 
 //----------------------------------------------------------------------------------------------
 
+void TPrimitiva::AcrescentaCirculo(
+  std::vector<TArestaCandidata>& arestas,
+  const TVetor3D& centro,
+  const TVetor3D& u,
+  const TVetor3D& v,
+  double raio
+)
+{
+  constexpr int SEGMENTOS = 48;
+  constexpr double PI = 3.14159265358979323846;
+
+  const auto ponto = [&](double angulo) {
+    return centro + raio * std::cos(angulo) * u + raio * std::sin(angulo) * v;
+  };
+
+  for (int i = 0; i < SEGMENTOS; ++i) {
+    const double inicio = 2.0 * PI * i / SEGMENTOS;
+    const double fim = 2.0 * PI * (i + 1) / SEGMENTOS;
+    arestas.push_back({ TAresta(ponto(inicio), ponto(fim)), ponto((inicio + fim) / 2.0) });
+  }
+}
+
+//----------------------------------------------------------------------------------------------
+
 EClassificacao TPrimitiva::ClassificaPorDistancia(
   double distanciaComSinal
 )

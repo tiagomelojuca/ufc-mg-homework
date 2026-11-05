@@ -195,3 +195,29 @@ TCaixa TBloco::CaixaCanonica() const
 }
 
 //----------------------------------------------------------------------------------------------
+
+std::vector<TArestaCandidata> TBloco::ArestasDoContorno() const
+{
+  const TCaixa caixa = CaixaCanonica();
+  const auto canto = [&caixa](int indice) {
+    return TVetor3D {
+      (indice & 1) ? caixa.maximo.x : caixa.minimo.x,
+      (indice & 2) ? caixa.maximo.y : caixa.minimo.y,
+      (indice & 4) ? caixa.maximo.z : caixa.minimo.z
+    };
+  };
+
+  // Os doze lados ligam cantos cujos índices diferem em um único bit, isto é, em um só eixo.
+  std::vector<TArestaCandidata> arestas;
+  for (int indice = 0; indice < 8; ++indice) {
+    for (int bit : { 1, 2, 4 }) {
+      if ((indice & bit) == 0) {
+        arestas.push_back({ TAresta(canto(indice), canto(indice | bit)), std::nullopt });
+      }
+    }
+  }
+
+  return arestas;
+}
+
+//----------------------------------------------------------------------------------------------

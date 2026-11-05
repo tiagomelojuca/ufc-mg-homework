@@ -21,6 +21,7 @@ Um card está concluído quando atende aos requisitos, compila e passa nos teste
 | `C11` | Exibir a SMC graficamente | Cores distintas para IN, ON e OUT. | Tiago |
 | `C12` | Integrar operações à interface | Criação, operações, análise e arquivos acessíveis pela interface. | Tiago |
 | `C18` | Adicionar cilindro e interseção | Requisitos de mestrado. | Tiago |
+| `C20` | Renderizar em aramado | Requisito de mestrado. Segmentos `EonS`. | Tiago |
 
 ## Em andamento
 
@@ -58,12 +59,11 @@ As aulas não definem estes pontos. Adotamos deduções que precisam ser confirm
 
 ## Bônus — após `C17`
 
-`C18` foi antecipado e está em Concluído.
+`C18` e `C20` foram antecipados e estão em Concluído.
 
 | ID | Título | Requisitos | Responsável |
 | --- | --- | --- | --- |
 | `C19` | Calcular a área de superfície | Requisito de mestrado. Cálculo sobre a árvore. | A definir |
-| `C20` | Renderizar em aramado | Requisito de mestrado. Segmentos `EonS`. | A definir |
 | `C21` | Renderizar a árvore CSG | Visualização da árvore, além das primitivas. | A definir |
 | `C22` | Adicionar cone, diferença e rotação | Requisitos de doutorado. Rotação como nó da árvore. | A definir |
 | `C23` | Renderizar por ray-tracing | Requisito de doutorado. | A definir |
