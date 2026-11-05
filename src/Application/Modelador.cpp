@@ -1,9 +1,7 @@
 #include "Modelador.h"
 
 #include <algorithm>
-#include <locale>
 #include <memory>
-#include <sstream>
 #include <stdexcept>
 
 #include "Core/Bloco.h"
@@ -11,35 +9,12 @@
 #include "Core/Cilindro.h"
 #include "Core/Esfera.h"
 #include "Core/Octree.h"
+#include "Formatacao.h"
 
 namespace
 {
   constexpr int PROFUNDIDADE_MINIMA = 1;
   constexpr int PROFUNDIDADE_MAXIMA = 8;
-
-  //--------------------------------------------------------------------------------------------
-
-  // Número curto para o nome do modelo, com ponto decimal independente da configuração regional.
-  std::string FormataNumero(
-    double valor
-  )
-  {
-    std::ostringstream fluxo;
-    fluxo.imbue(std::locale::classic());
-    fluxo << valor;
-    return fluxo.str();
-  }
-
-  //--------------------------------------------------------------------------------------------
-
-  std::string FormataVetor(
-    const TVetor3D& valores
-  )
-  {
-    return
-      "(" + FormataNumero(valores.x) + ", " + FormataNumero(valores.y) + ", " +
-      FormataNumero(valores.z) + ")";
-  }
 
   //--------------------------------------------------------------------------------------------
 

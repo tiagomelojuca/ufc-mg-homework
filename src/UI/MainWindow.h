@@ -2,6 +2,7 @@
 #define MAINWINDOW_H_
 
 #include "Application/Modelador.h"
+#include "PainelArvore.h"
 #include "PainelModelos.h"
 #include "PainelRayCasting.h"
 #include "Window.h"
@@ -38,6 +39,7 @@ class TEstrategiaProcessamentoMainWindow : public TWindow::TEstrategiaProcessame
     TModelador modelador;
     TPainelModelos painelModelos;
     TPainelRayCasting painelRayCasting;
+    TPainelArvore painelArvore;
 
     // Árvore em exibição, para reenquadrar a visualização só quando a seleção muda.
     TArvoreCSG arvoreExibida;

@@ -76,10 +76,12 @@ void TEstrategiaProcessamentoMainWindow::Executa()
   const TArvoreCSG arvore = selecionado ? modelador.Modelo(*selecionado).arvore : nullptr;
   if (arvore != arvoreExibida) {
     painelRayCasting.DefineArvore(arvore);
+    painelArvore.DefineArvore(arvore);
     arvoreExibida = arvore;
   }
 
   painelRayCasting.Desenha();
+  painelArvore.Desenha();
 
   ImGui::Render();
 
