@@ -14,8 +14,7 @@ enum class ETipoNoCSG
 {
   PRIMITIVA,
   OPERACAO_BOOLEANA,
-  MOVIMENTO_RIGIDO,
-  ESCALA
+  MOVIMENTO_RIGIDO
 };
 
 //----------------------------------------------------------------------------------------------
@@ -69,33 +68,6 @@ class TMovimentoRigido
     ETipoMovimentoRigido tipo;
     TVetor3D valores;
 };
-class TEscala
-{
-  public:
-    // Os fatores devem ser finitos e diferentes de zero (negativo espelha o eixo).
-    explicit TEscala(
-      const TVetor3D& fatores
-    );
-
-    const TVetor3D& Fatores() const;
-
-    // Leva do sistema do filho ao sistema do pai.
-    TMatriz4x4 Matriz() const;
-
-    // Leva do sistema do pai ao sistema do filho.
-    TMatriz4x4 MatrizInversa() const;
-
-    TVetor3D LevaAoSistemaDoFilho(
-      const TVetor3D& ponto
-    ) const;
-
-    TAresta LevaAoSistemaDoFilho(
-      const TAresta& aresta
-    ) const;
-
-  private:
-    TVetor3D fatores;
-};
 //----------------------------------------------------------------------------------------------
 
 class TNoCSG;
@@ -131,12 +103,7 @@ class TNoCSG
     TNoCSG& operator=(
       const TNoCSG&
     ) = delete;
-    
-    TNoCSG(
-    const TEscala& escala,
-    TArvoreCSG filho
-  );
-    const TEscala& Escala() const;
+
     ETipoNoCSG Tipo() const;
 
     const TPrimitiva& Primitiva() const;
@@ -157,16 +124,11 @@ class TNoCSG
     std::shared_ptr<const TPrimitiva> primitiva;
     EOperacaoBooleana operacao;
     TMovimentoRigido movimento;
-    TEscala escala;   
     TArvoreCSG esquerda;
     TArvoreCSG direita;
 };
 
 //----------------------------------------------------------------------------------------------
-TArvoreCSG CriaEscala(
-  const TEscala& escala,
-  TArvoreCSG filho
-);
 
 TArvoreCSG CriaPrimitiva(
   std::shared_ptr<const TPrimitiva> primitiva
@@ -181,6 +143,14 @@ TArvoreCSG CriaOperacaoBooleana(
 TArvoreCSG CriaMovimentoRigido(
   const TMovimentoRigido& movimento,
   TArvoreCSG filho
+);
+
+// A escala altera os parâmetros de dimensão e não cria nó: a primitiva na base da árvore é trocada
+// por outra com os parâmetros multiplicados pelos fatores, nos eixos do seu sistema canônico. Os
+// movimentos rígidos acima dela são refeitos sobre a nova primitiva; a árvore original não muda.
+TArvoreCSG Escala(
+  const TArvoreCSG& arvore,
+  const TVetor3D& fatores
 );
 
 //----------------------------------------------------------------------------------------------

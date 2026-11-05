@@ -176,3 +176,14 @@ TVetor3D TBloco::Normal(
 }
 
 //----------------------------------------------------------------------------------------------
+
+std::shared_ptr<const TPrimitiva> TBloco::Escalada(
+  const TVetor3D& fatores
+) const
+{
+  ExigeFatoresDeEscala(fatores);
+
+  return std::make_shared<TBloco>(ladoX * fatores.x, ladoY * fatores.y, ladoZ * fatores.z);
+}
+
+//----------------------------------------------------------------------------------------------

@@ -166,15 +166,5 @@ TVetor3D TMatriz4x4::TransformaNormalPelaTransposta(
 
   return { resultado[0], resultado[1], resultado[2] };
 }
-TMatriz4x4 TMatriz4x4::Escala(
-  const TVetor3D& fatores
-)
-{
-  TMatriz4x4 matriz = Identidade();
-  matriz.elementos[0][0] = fatores.x;
-  matriz.elementos[1][1] = fatores.y;
-  matriz.elementos[2][2] = fatores.z;
 
-  return matriz;
-}
 //----------------------------------------------------------------------------------------------

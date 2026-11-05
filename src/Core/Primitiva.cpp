@@ -18,6 +18,18 @@ void TPrimitiva::ExigeDimensaoPositiva(
 
 //----------------------------------------------------------------------------------------------
 
+void TPrimitiva::ExigeFatoresDeEscala(
+  const TVetor3D& fatores
+)
+{
+  const char* mensagem = "Os fatores de escala devem ser finitos e positivos";
+  ExigeDimensaoPositiva(fatores.x, mensagem);
+  ExigeDimensaoPositiva(fatores.y, mensagem);
+  ExigeDimensaoPositiva(fatores.z, mensagem);
+}
+
+//----------------------------------------------------------------------------------------------
+
 EClassificacao TPrimitiva::ClassificaPorDistancia(
   double distanciaComSinal
 )

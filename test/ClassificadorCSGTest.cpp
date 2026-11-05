@@ -37,10 +37,6 @@ TArvoreCSG Rotacionada(const TArvoreCSG &arvore, const TVetor3D &angulos) {
       TMovimentoRigido(ETipoMovimentoRigido::ROTACAO, angulos), arvore);
 }
 
-TArvoreCSG Escalada(const TArvoreCSG &arvore, const TVetor3D &fatores) {
-  return CriaEscala(TEscala(fatores), arvore);
-}
-
 // Confere as classes e os limites de cada trecho, na ordem de t.
 void EsperaTrechos(const TClassificacaoAresta &resultado,
                    const std::vector<TSegmentoClassificado> &esperados) {
@@ -299,12 +295,12 @@ TEST(ClassificadorCSGTest,
 //----------------------------------------------------------------------------------------------
 
 TEST(ClassificadorCSGTest,
-     deve_levar_as_normais_atraves_da_escala) {
+     deve_levar_ao_interior_apenas_a_parte_encostada_da_face) {
   // O bloco escalado ocupa x em [1, 3] e y em [-3, 3]; só a parte da face
   // x = 1 encostada no primeiro bloco passa ao interior.
   const TArvoreCSG uniao = Uniao(
       CriaBloco(2.0),
-      Transladada(Escalada(CriaBloco(2.0), {1.0, 3.0, 1.0}), {2.0, 0.0, 0.0}));
+      Transladada(Escala(CriaBloco(2.0), {1.0, 3.0, 1.0}), {2.0, 0.0, 0.0}));
 
   const TClassificacaoAresta resultado =
       ClassificaAresta(uniao, TAresta({1.0, -3.0, 0.0}, {1.0, 3.0, 0.0}));

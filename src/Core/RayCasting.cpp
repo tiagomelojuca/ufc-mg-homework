@@ -78,13 +78,6 @@ TVetor3D NormalNoPonto(
       return Normaliza(movimento.MatrizInversa().TransformaNormalPelaTransposta(normalNoFilho));
     }
 
-    case ETipoNoCSG::ESCALA: {
-      const TEscala& escala = arvore->Escala();
-      const TVetor3D normalNoFilho =
-        NormalNoPonto(arvore->Filho(), escala.LevaAoSistemaDoFilho(ponto));
-      return Normaliza(escala.MatrizInversa().TransformaNormalPelaTransposta(normalNoFilho));
-    }
-
     case ETipoNoCSG::OPERACAO_BOOLEANA: {
       if (arvore->Operacao() != EOperacaoBooleana::UNIAO) {
         throw std::logic_error("Operação booleana ainda não implementada");

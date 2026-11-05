@@ -389,9 +389,6 @@ EClassificacao ClassificaPonto(
     case ETipoNoCSG::MOVIMENTO_RIGIDO:
       return ClassificaPonto(arvore->Filho(), arvore->Movimento().LevaAoSistemaDoFilho(ponto));
 
-    case ETipoNoCSG::ESCALA:
-      return ClassificaPonto(arvore->Filho(), arvore->Escala().LevaAoSistemaDoFilho(ponto));
-
     case ETipoNoCSG::OPERACAO_BOOLEANA:
       return CombinaClassificacoes(
         arvore->Operacao(),
@@ -410,7 +407,7 @@ TClassificacaoAresta ClassificaAresta(
   const TAresta& aresta
 )
 {
-  // As transformações são afins: o t da aresta original é o mesmo no sistema do filho.
+  // O movimento rígido é afim: o t da aresta original é o mesmo no sistema do filho.
   switch (arvore->Tipo()) {
     case ETipoNoCSG::PRIMITIVA:
       return arvore->Primitiva().ClassificaAresta(aresta);
@@ -419,12 +416,6 @@ TClassificacaoAresta ClassificaAresta(
       return LevaVizinhancasAoSistemaDoPai(
         ClassificaAresta(arvore->Filho(), arvore->Movimento().LevaAoSistemaDoFilho(aresta)),
         arvore->Movimento().MatrizInversa()
-      );
-
-    case ETipoNoCSG::ESCALA:
-      return LevaVizinhancasAoSistemaDoPai(
-        ClassificaAresta(arvore->Filho(), arvore->Escala().LevaAoSistemaDoFilho(aresta)),
-        arvore->Escala().MatrizInversa()
       );
 
     case ETipoNoCSG::OPERACAO_BOOLEANA:

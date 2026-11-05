@@ -28,6 +28,10 @@ class TEsfera : public TPrimitiva
       const TVetor3D& ponto
     ) const override;
 
+    std::shared_ptr<const TPrimitiva> Escalada(
+      const TVetor3D& fatores
+    ) const override;
+
   private:
     double raio;
 };

@@ -7,7 +7,9 @@
 namespace
 {
   const TMovimentoRigido MOVIMENTO_NULO(ETipoMovimentoRigido::TRANSLACAO, { 0.0, 0.0, 0.0 });
-  const TEscala ESCALA_UNITARIA({ 1.0, 1.0, 1.0 });
+
+  //--------------------------------------------------------------------------------------------
+
   void ExigeSubarvore(
     const TArvoreCSG& subarvore
   )
@@ -60,46 +62,6 @@ TMatriz4x4 TMovimentoRigido::Matriz() const
     TMatriz4x4::RotacaoX(valores.x);
 }
 
-TEscala::TEscala(
-  const TVetor3D& fatores
-) :
-  fatores(fatores)
-{
-  const bool finitos = std::isfinite(fatores.x) && std::isfinite(fatores.y) && std::isfinite(fatores.z);
-  if (!finitos || fatores.x == 0.0 || fatores.y == 0.0 || fatores.z == 0.0) {
-    throw std::invalid_argument("Os fatores de escala devem ser finitos e diferentes de zero");
-  }
-}
-
-const TVetor3D& TEscala::Fatores() const
-{
-  return fatores;
-}
-
-TMatriz4x4 TEscala::Matriz() const
-{
-  return TMatriz4x4::Escala(fatores);
-}
-
-TMatriz4x4 TEscala::MatrizInversa() const
-{
-  return TMatriz4x4::Escala({ 1.0 / fatores.x, 1.0 / fatores.y, 1.0 / fatores.z });
-}
-
-TVetor3D TEscala::LevaAoSistemaDoFilho(
-  const TVetor3D& ponto
-) const
-{
-  return MatrizInversa().TransformaPonto(ponto);
-}
-
-TAresta TEscala::LevaAoSistemaDoFilho(
-  const TAresta& aresta
-) const
-{
-  const TMatriz4x4 inversa = MatrizInversa();
-  return TAresta(inversa.TransformaPonto(aresta.Inicio()), inversa.TransformaPonto(aresta.Fim()));
-}
 //----------------------------------------------------------------------------------------------
 
 TMatriz4x4 TMovimentoRigido::MatrizInversa() const
@@ -144,8 +106,7 @@ TNoCSG::TNoCSG(
   tipo(ETipoNoCSG::PRIMITIVA),
   primitiva(std::move(primitiva)),
   operacao(EOperacaoBooleana::UNIAO),
-  movimento(MOVIMENTO_NULO),
-  escala(ESCALA_UNITARIA)
+  movimento(MOVIMENTO_NULO)
 {
   if (this->primitiva == nullptr) {
     throw std::invalid_argument("A primitiva nao pode ser vazia");
@@ -162,25 +123,13 @@ TNoCSG::TNoCSG(
   tipo(ETipoNoCSG::OPERACAO_BOOLEANA),
   operacao(operacao),
   movimento(MOVIMENTO_NULO),
-  escala(ESCALA_UNITARIA),
   esquerda(std::move(esquerda)),
   direita(std::move(direita))
 {
   ExigeSubarvore(this->esquerda);
   ExigeSubarvore(this->direita);
 }
-TNoCSG::TNoCSG(
-  const TEscala& escala,
-  TArvoreCSG filho
-) :
-  tipo(ETipoNoCSG::ESCALA),
-  operacao(EOperacaoBooleana::UNIAO),
-  movimento(MOVIMENTO_NULO),
-  escala(escala),
-  esquerda(std::move(filho))
-{
-  ExigeSubarvore(esquerda);
-}
+
 //----------------------------------------------------------------------------------------------
 
 TNoCSG::TNoCSG(
@@ -190,25 +139,11 @@ TNoCSG::TNoCSG(
   tipo(ETipoNoCSG::MOVIMENTO_RIGIDO),
   operacao(EOperacaoBooleana::UNIAO),
   movimento(movimento),
-  escala(ESCALA_UNITARIA),
   esquerda(std::move(filho))
 {
   ExigeSubarvore(esquerda);
-  
-}
-const TEscala& TNoCSG::Escala() const
-{
-  ExigeTipo(ETipoNoCSG::ESCALA);
-  return escala;
 }
 
-TArvoreCSG CriaEscala(
-  const TEscala& escala,
-  TArvoreCSG filho
-)
-{
-  return std::make_shared<const TNoCSG>(escala, std::move(filho));
-}
 //----------------------------------------------------------------------------------------------
 
 ETipoNoCSG TNoCSG::Tipo() const
@@ -260,10 +195,7 @@ const TMovimentoRigido& TNoCSG::Movimento() const
 
 const TArvoreCSG& TNoCSG::Filho() const
 {
-   if (tipo != ETipoNoCSG::MOVIMENTO_RIGIDO && tipo != ETipoNoCSG::ESCALA) {
-    throw std::logic_error("Operacao invalida para este tipo de no");
-  }
-
+  ExigeTipo(ETipoNoCSG::MOVIMENTO_RIGIDO);
   return esquerda;
 }
 
@@ -306,6 +238,29 @@ TArvoreCSG CriaMovimentoRigido(
 )
 {
   return std::make_shared<const TNoCSG>(movimento, std::move(filho));
+}
+
+//----------------------------------------------------------------------------------------------
+
+TArvoreCSG Escala(
+  const TArvoreCSG& arvore,
+  const TVetor3D& fatores
+)
+{
+  ExigeSubarvore(arvore);
+
+  switch (arvore->Tipo()) {
+    case ETipoNoCSG::PRIMITIVA:
+      return CriaPrimitiva(arvore->Primitiva().Escalada(fatores));
+
+    case ETipoNoCSG::MOVIMENTO_RIGIDO:
+      return CriaMovimentoRigido(arvore->Movimento(), Escala(arvore->Filho(), fatores));
+
+    case ETipoNoCSG::OPERACAO_BOOLEANA:
+      throw std::invalid_argument("A escala se aplica apenas a primitivas");
+  }
+
+  throw std::logic_error("Tipo de no desconhecido");
 }
 
 //----------------------------------------------------------------------------------------------

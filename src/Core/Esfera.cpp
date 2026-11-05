@@ -1,6 +1,7 @@
 #include "Esfera.h"
 
 #include <cmath>
+#include <stdexcept>
 
 //----------------------------------------------------------------------------------------------
 
@@ -74,6 +75,22 @@ TVetor3D TEsfera::Normal(
 ) const
 {
   return Normaliza(ponto);
+}
+
+//----------------------------------------------------------------------------------------------
+
+std::shared_ptr<const TPrimitiva> TEsfera::Escalada(
+  const TVetor3D& fatores
+) const
+{
+  ExigeFatoresDeEscala(fatores);
+
+  // Com fatores diferentes o resultado seria um elipsoide, que não é uma esfera.
+  if (fatores.x != fatores.y || fatores.y != fatores.z) {
+    throw std::invalid_argument("A esfera admite apenas escala uniforme");
+  }
+
+  return std::make_shared<TEsfera>(raio * fatores.x);
 }
 
 //----------------------------------------------------------------------------------------------

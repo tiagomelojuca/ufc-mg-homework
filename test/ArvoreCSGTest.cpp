@@ -44,6 +44,13 @@ namespace
         return { 0.0, 0.0, 1.0 };
       }
 
+      std::shared_ptr<const TPrimitiva> Escalada(
+        const TVetor3D&
+      ) const override
+      {
+        return std::make_shared<TPrimitivaTeste>(tipo);
+      }
+
     private:
       ETipoPrimitiva tipo;
   };

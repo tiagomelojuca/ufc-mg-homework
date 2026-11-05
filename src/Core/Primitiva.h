@@ -1,6 +1,8 @@
 #ifndef PRIMITIVA_H_
 #define PRIMITIVA_H_
 
+#include <memory>
+
 #include "Classificacao.h"
 #include "Vetor3D.h"
 
@@ -37,10 +39,20 @@ class TPrimitiva
       const TVetor3D& ponto
     ) const = 0;
 
+    // Nova primitiva com os parâmetros de dimensão multiplicados pelos fatores, em x, y e z do
+    // sistema canônico. A primitiva original não muda.
+    virtual std::shared_ptr<const TPrimitiva> Escalada(
+      const TVetor3D& fatores
+    ) const = 0;
+
   protected:
     static void ExigeDimensaoPositiva(
       double valor,
       const char* mensagem
+    );
+
+    static void ExigeFatoresDeEscala(
+      const TVetor3D& fatores
     );
 
     // Converte a distância com sinal à fronteira (negativa dentro) em IN, ON ou OUT.

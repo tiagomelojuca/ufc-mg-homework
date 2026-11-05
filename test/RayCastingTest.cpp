@@ -164,18 +164,20 @@ TEST(RayCastingTest, deve_girar_a_normal_com_a_rotacao)
 
 //----------------------------------------------------------------------------------------------
 
-TEST(RayCastingTest, deve_transformar_a_normal_pela_transposta_da_inversa_na_escala)
+TEST(RayCastingTest, deve_atingir_a_primitiva_escalada_pelos_parametros)
 {
-  // Elipsoide x²/4 + y² + z² = 1, cuja normal é proporcional a (x/4, y, z).
-  const TArvoreCSG elipsoide = CriaEscala(TEscala({ 2.0, 1.0, 1.0 }), CriaEsfera(1.0));
-  const double x = std::sqrt(2.0);
+  // O bloco 2 x 2 x 6 deslocado de 1 em z tem a face de cima em z = 4.
+  const TArvoreCSG alto = Transladada(
+    Escala(CriaBloco(2.0, 2.0, 2.0), { 1.0, 1.0, 3.0 }),
+    { 0.0, 0.0, 1.0 }
+  );
 
   const std::optional<TIntersecao> intersecao =
-    PrimeiraIntersecao(elipsoide, TAresta({ x, 0.0, 5.0 }, { x, 0.0, -5.0 }));
+    PrimeiraIntersecao(alto, TAresta({ 0.2, 0.3, 10.0 }, { 0.2, 0.3, -10.0 }));
 
   ASSERT_TRUE(intersecao.has_value());
-  EsperaVetor(intersecao->ponto, { x, 0.0, std::sqrt(0.5) });
-  EsperaVetor(intersecao->normal, Normaliza({ x / 4.0, 0.0, std::sqrt(0.5) }));
+  EsperaVetor(intersecao->ponto, { 0.2, 0.3, 4.0 });
+  EsperaVetor(intersecao->normal, { 0.0, 0.0, 1.0 });
 }
 
 //----------------------------------------------------------------------------------------------

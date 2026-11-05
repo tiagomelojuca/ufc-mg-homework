@@ -30,9 +30,6 @@ class TMatriz4x4
     static TMatriz4x4 RotacaoZ(
       double anguloGraus
     );
-    static TMatriz4x4 Escala(
-        const TVetor3D& fatores
-    );
     double Elemento(
       int linha,
       int coluna
