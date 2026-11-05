@@ -21,9 +21,9 @@ Um card está concluído quando atende aos requisitos, compila e passa nos teste
 | `C11` | Exibir a SMC graficamente | Cores distintas para IN, ON e OUT. | Tiago |
 | `C12` | Integrar operações à interface | Criação, operações, análise e arquivos acessíveis pela interface. | Tiago |
 | `C13` | Construir o tema | Carro simples em 3D com as operações implementadas, em `modelos/ford.txt`. | Tiago |
-| `C18` | Adicionar cilindro e interseção | Requisitos de mestrado. | Tiago |
-| `C20` | Renderizar em aramado | Requisito de mestrado. Segmentos `EonS`. | Tiago |
-| `C21` | Renderizar a árvore CSG | Visualização da árvore, além das primitivas. | Tiago |
+| `C16` | Adicionar cilindro e interseção | Requisitos de mestrado. | Tiago |
+| `C18` | Renderizar em aramado | Requisito de mestrado. Segmentos `EonS`. | Tiago |
+| `C19` | Renderizar a árvore CSG | Visualização da árvore, além das primitivas. | Tiago |
 
 ## Em andamento
 
@@ -37,8 +37,6 @@ Um card está concluído quando atende aos requisitos, compila e passa nos teste
 | --- | --- | --- | --- |
 | `C14` | Validar o MVP | Fluxo completo e testes aprovados em Linux. | A definir |
 | `C15` | Revisar antes da entrega | Conferir cada requisito contra enunciado e aulas. Verificar as deduções listadas abaixo. Código sem referências internas. Comentários claros e diretos. | A definir |
-| `C16` | Preparar a apresentação | Metodologia, modelagem e evidência de cada requisito. Falas separadas por integrante. Explicação clara e direta do código. | A definir |
-| `C17` | Preparar a entrega | Executável, bibliotecas, código-fonte e apresentação em um único arquivo compactado. Sem a pasta `docs`. | A definir |
 
 ### Deduções a verificar em `C15`
 
@@ -58,12 +56,12 @@ As aulas não definem estes pontos. Adotamos deduções que precisam ser confirm
 | --- | --- | --- | --- |
 | — | — | — | — |
 
-## Bônus — após `C17`
+## Bônus — após `C15`
 
-`C18`, `C20` e `C21` foram antecipados e estão em Concluído.
+`C16`, `C18` e `C19` foram antecipados e estão em Concluído.
 
 | ID | Título | Requisitos | Responsável |
 | --- | --- | --- | --- |
-| `C19` | Calcular a área de superfície | Requisito de mestrado. Cálculo sobre a árvore. | A definir |
-| `C22` | Adicionar cone, diferença e rotação | Requisitos de doutorado. Rotação como nó da árvore. | A definir |
-| `C23` | Renderizar por ray-tracing | Requisito de doutorado. | A definir |
+| `C17` | Calcular a área de superfície | Requisito de mestrado. Cálculo sobre a árvore. | A definir |
+| `C20` | Adicionar cone, diferença e rotação | Requisitos de doutorado. Rotação como nó da árvore. | A definir |
+| `C21` | Renderizar por ray-tracing | Requisito de doutorado. | A definir |
