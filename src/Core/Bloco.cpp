@@ -11,7 +11,9 @@ namespace
   {
     double tEntrada;
     double tSaida;
-    bool sobrePlano;
+
+    // +1 ou -1 quando a aresta está sobre o plano em +meioLado ou em -meioLado; 0 caso contrário.
+    double ladoDoPlano;
   };
 
   TIntervaloFaixa IntersectaFaixa(
@@ -26,16 +28,17 @@ namespace
     if (direcao == 0.0) {
       const double distancia = std::abs(origem) - meioLado;
       if (distancia > TOLERANCIA_GEOMETRICA) {
-        return { infinito, -infinito, false };
+        return { infinito, -infinito, 0.0 };
       }
 
-      return { -infinito, infinito, distancia >= -TOLERANCIA_GEOMETRICA };
+      const bool sobrePlano = distancia >= -TOLERANCIA_GEOMETRICA;
+      return { -infinito, infinito, sobrePlano ? (origem > 0.0 ? 1.0 : -1.0) : 0.0 };
     }
 
     const double t1 = (-meioLado - origem) / direcao;
     const double t2 = (meioLado - origem) / direcao;
 
-    return { std::min(t1, t2), std::max(t1, t2), false };
+    return { std::min(t1, t2), std::max(t1, t2), 0.0 };
   }
 }
 
@@ -116,20 +119,35 @@ TClassificacaoAresta TBloco::ClassificaAresta(
     IntersectaFaixa(origem.z, direcao.z, ladoZ / 2.0)
   };
 
+  const TVetor3D eixos[] = { { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } };
+
   double tEntrada = -std::numeric_limits<double>::infinity();
   double tSaida = std::numeric_limits<double>::infinity();
-  bool sobreFace = false;
 
-  for (const TIntervaloFaixa& faixa : faixas) {
-    tEntrada = std::max(tEntrada, faixa.tEntrada);
-    tSaida = std::min(tSaida, faixa.tSaida);
-    sobreFace = sobreFace || faixa.sobrePlano;
+  // Normais exteriores das faces que contêm a aresta: uma sobre a face, duas sobre um lado do bloco.
+  TConeVizinhanca normais;
+
+  for (int i = 0; i < 3; ++i) {
+    tEntrada = std::max(tEntrada, faixas[i].tEntrada);
+    tSaida = std::min(tSaida, faixas[i].tSaida);
+    if (faixas[i].ladoDoPlano != 0.0) {
+      normais.push_back(faixas[i].ladoDoPlano * eixos[i]);
+    }
+  }
+
+  if (normais.empty()) {
+    return ClassificaPorIntervalo(
+      tEntrada,
+      tSaida,
+      EClassificacao::IN
+    );
   }
 
   return ClassificaPorIntervalo(
     tEntrada,
     tSaida,
-    sobreFace ? EClassificacao::ON : EClassificacao::IN
+    EClassificacao::ON,
+    { normais }
   );
 }
 

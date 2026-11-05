@@ -24,6 +24,8 @@ O nó de movimento rígido, exigido pela modelagem local, classifica a aresta tr
 
 `Combine_M` segue os passos da aula: ordenar os segmentos de cada classificação, aplicar a operação booleana segmento a segmento e juntar os resultados. A combinação é regularizada.
 
+A regularização usa a vizinhança dos segmentos ON. Cada segmento ON leva as normais exteriores das faces que o contêm: uma sobre uma face, duas sobre uma aresta do bloco. Nos nós de movimento rígido e de escala, as normais voltam ao sistema do pai pela transposta da inversa. Quando os dois lados de um trecho são ON, as vizinhanças são unidas no plano perpendicular à aresta. Se a união cobre todas as direções, como em faces encostadas com normais opostas, o trecho passa a IN; caso contrário continua ON com a vizinhança unida.
+
 O ray-casting usa a mesma recursão com uma aresta semi-infinita, o raio, e toma a primeira interseção. A cor resulta de um modelo de iluminação com normal, propriedades da superfície e posição da luz.
 
 A exibição da SMC classifica arestas finitas contra a árvore e desenha cada parte com a cor de IN, ON ou OUT.

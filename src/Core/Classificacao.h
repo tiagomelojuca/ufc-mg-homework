@@ -45,11 +45,22 @@ class TAresta
 
 //----------------------------------------------------------------------------------------------
 
+// Vizinhança de um trecho ON: as direções que, a partir de um ponto do trecho, entram no sólido.
+// Cada cone é a interseção dos semiespaços n · v <= 0, um para cada normal exterior das faces
+// que contêm o trecho; a vizinhança é a união dos cones.
+using TConeVizinhanca = std::vector<TVetor3D>;
+using TVizinhanca = std::vector<TConeVizinhanca>;
+
+//----------------------------------------------------------------------------------------------
+
 struct TSegmentoClassificado
 {
   double tInicio;
   double tFim;
   EClassificacao classificacao;
+
+  // Preenchida apenas em trechos ON; vazia quando a vizinhança é desconhecida.
+  TVizinhanca vizinhanca = {};
 };
 
 // Partes da aresta em ordem de t, sem sobreposição, cobrindo todo o intervalo [0, 1].

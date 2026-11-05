@@ -96,6 +96,42 @@ TEST(BlocoTest, deve_classificar_como_na_fronteira_aresta_sobre_uma_aresta_do_bl
 
 //----------------------------------------------------------------------------------------------
 
+TEST(BlocoTest, deve_dar_a_normal_exterior_da_face_como_vizinhanca)
+{
+  const TBloco bloco(2.0, 2.0, 2.0);
+
+  const TClassificacaoAresta resultado = bloco.ClassificaAresta(
+    TAresta({ -2.0, 0.0, 1.0 }, { 2.0, 0.0, 1.0 })
+  );
+
+  ASSERT_EQ(resultado.size(), 3u);
+  EXPECT_TRUE(resultado[0].vizinhanca.empty());
+  ASSERT_EQ(resultado[1].vizinhanca.size(), 1u);
+  ASSERT_EQ(resultado[1].vizinhanca[0].size(), 1u);
+  EXPECT_DOUBLE_EQ(resultado[1].vizinhanca[0][0].x, 0.0);
+  EXPECT_DOUBLE_EQ(resultado[1].vizinhanca[0][0].y, 0.0);
+  EXPECT_DOUBLE_EQ(resultado[1].vizinhanca[0][0].z, 1.0);
+}
+
+//----------------------------------------------------------------------------------------------
+
+TEST(BlocoTest, deve_dar_as_normais_das_duas_faces_sobre_uma_aresta_do_bloco)
+{
+  const TBloco bloco(2.0, 2.0, 2.0);
+
+  const TClassificacaoAresta resultado = bloco.ClassificaAresta(
+    TAresta({ 1.0, -1.0, -1.0 }, { 1.0, -1.0, 1.0 })
+  );
+
+  ASSERT_EQ(resultado.size(), 1u);
+  ASSERT_EQ(resultado[0].vizinhanca.size(), 1u);
+  ASSERT_EQ(resultado[0].vizinhanca[0].size(), 2u);
+  EXPECT_DOUBLE_EQ(resultado[0].vizinhanca[0][0].x, 1.0);
+  EXPECT_DOUBLE_EQ(resultado[0].vizinhanca[0][1].y, -1.0);
+}
+
+//----------------------------------------------------------------------------------------------
+
 TEST(BlocoTest, deve_classificar_como_fora_aresta_que_toca_apenas_um_vertice)
 {
   const TBloco bloco(2.0, 2.0, 2.0);

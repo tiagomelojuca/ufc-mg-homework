@@ -45,10 +45,12 @@ class TPrimitiva
 
     // Monta a classificação de uma aresta que está na primitiva apenas entre tEntrada e tSaida:
     // OUT antes, classificacaoInterna no intervalo e OUT depois, recortando em [0, 1].
+    // A vizinhança acompanha o trecho interno quando ele é ON.
     static TClassificacaoAresta ClassificaPorIntervalo(
       double tEntrada,
       double tSaida,
-      EClassificacao classificacaoInterna
+      EClassificacao classificacaoInterna,
+      const TVizinhanca& vizinhancaInterna = {}
     );
 };
 
